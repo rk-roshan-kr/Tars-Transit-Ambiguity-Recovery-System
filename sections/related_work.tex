@@ -1,0 +1,64 @@
+\section{Related Work} \label{sec:related_work}
+
+The automated vetting of exoplanet transit candidates has evolved through three distinct paradigms: deterministic rule-based systems, statistical population synthesis, and deep learning classification. This section reviews these paradigms, details their physical and statistical assumptions, and positions the TARS v1 framework within the literature.
+
+\subsection{Rule-Based Heuristic Vetting} \label{sec:heuristic_vetting}
+Early wide-field transit surveys relied on deterministic, rule-based decision trees to filter out false positives. The primary reference for this approach is Kepler’s Robovetter \citep{Coughlin2016, Thompson2018}. Robovetter evaluates Threshold Crossing Events (TCEs) by passing them through a series of sequential tests, checking for:
+\begin{itemize}
+\item Data quality flag anomalies (e.g., pointing offsets and cosmic ray hits).
+\item Inherent signal consistency, such as comparing the depth of odd and even transits to identify eclipsing binaries.
+\item The presence of secondary eclipses, which indicates a stellar or substellar companion rather than a planet.
+\item Individual transit morphology fits to ensure the transit shape matches a physical light curve model \citep{Mandel2002}.
+\end{itemize}
+
+Although Robovetter is computationally efficient and highly interpretable, its inputs are pre-filtered by hard detection threshold boundaries (such as the Kepler pipeline's detection threshold requiring $\text{SNR} \ge 7.1$ \citealt{Jenkins2010}). Marginal candidates falling just below these thresholds are rejected without any quantification of the surrounding uncertainty. This rigidity limits its ability to handle signals near the detection limit or in the presence of complex stellar activity.
+
+\subsection{Statistical Validation and False Positive Probability (FPP)} \label{sec:statistical_validation}
+To address the limitations of binary classification, statistical validation frameworks were developed to calculate the False Positive Probability (FPP) of individual candidates. The leading tools are Vespa \citep{Morton2012, Morton2015} and Triceratops \citep{Giacalone2021}.
+
+Vespa computes the FPP by performing Bayesian model comparison, evaluating the relative likelihood of the observed transit shape under multiple astronomical scenarios:
+\begin{enumerate}
+\item A transiting planet around the target star.
+\item A blended eclipsing binary (BEB) in the background.
+\item A bound eclipsing binary companion (HEB).
+\item A companion star with a transiting planet.
+\end{enumerate}
+
+Triceratops extends this methodology by incorporating spatial priors from nearby stellar catalogs, which is particularly important for TESS due to its large pixel scale ($21''$ per pixel) where flux contamination is common.
+
+These validation models focus on \textbf{aleatoric uncertainty}---specifically, the physical source degeneracy (i.e., whether the physical source causing the dip is a planet or a binary companion). However, they do not address \textbf{epistemic uncertainty}---the recovery ambiguity of the signal itself under non-stationary noise or stellar activity. They assume that the detected period and transit shape are correct and do not model the likelihood of the recovery pipeline locking onto incorrect alias periods. Furthermore, these tools are computationally intensive, requiring external stellar population simulations.
+
+\subsection{Deep Learning and Dimensionality Reduction Vetting} \label{sec:deep_learning_vetting}
+With the explosion of data from surveys, machine learning models have been deployed to automate classification. The most notable implementation is Astronet \citep{Shallue2018}, a deep convolutional neural network (CNN) that classifies TCEs using 1D light curve representations. Other models, such as DAVE \citep{Kostov2019}, incorporate non-linear feature embeddings and centroid motion analysis to improve classification accuracy.
+
+Deep neural networks achieve high predictive performance on validation sets. However, they act as black-box estimators, making it difficult to trace why specific candidates are rejected. Furthermore, deep classifiers are prone to overconfidence and calibration decay under dataset shifts \citep{Guo2017}. Post-hoc calibration techniques, such as temperature scaling, ensemble models, or post-hoc binning, have been investigated to mitigate this issue. However, if a model trained on quiet stars is applied to highly active stars, the predicted class probabilities $P(\text{Planet} \mid X)$ still fail to reflect the increased signal recovery ambiguity, leading to high false positive rates.
+
+\subsection{Novelty Positioning: Signal Ambiguity vs. Classification Probability} \label{sec:novelty_positioning}
+TARS v1 addresses one limitation not explicitly addressed in previous work: the conflation of classification probability with recovery ambiguity. Traditional classifiers output a probability $P(\text{Planet} \mid X)$, which is sensitive to training class distributions and dataset selection biases.
+
+In contrast, the Recovery Ambiguity Index (RAI) measures the epistemic uncertainty of the signal itself: \textit{How easily is the signal's period and morphology confused with stellar rotation, harmonics, or random noise regimes?}
+
+By computing features like period uniqueness, candidate concentration, and graph clustering of alias frequencies, the RAI quantifies the inherent ambiguity in the transit detection workflow. This provides a highly parsimonious (1 derived index), well-calibrated (ECE = 0.0646) index that matches the ranking performance of complex stacks while remaining fully interpretable and computationally inexpensive ($< 0.1$ s execution time).
+
+\begin{deluxetable*}{llllll}
+\tabletypesize{\footnotesize}
+\tablecaption{Novelty Matrix Comparison\label{tab:novelty}}
+\tablewidth{0pt}
+\tablehead{
+\colhead{Dimension} & \colhead{Robovetter} & \colhead{Vespa} & \colhead{Triceratops} & \colhead{Astronet} & \colhead{TARS v1 (This Work)}
+}
+\startdata
+\textbf{Primary Goal} & Automated threshold vetting & Statistical FPP & FPP under blends & \parbox{2.2cm}{CNN classification of TCEs} & \parbox{3.5cm}{Quantify signal recovery ambiguity} \\
+\textbf{Core Metric} & Decision tree flags & FPP point estimate & FPP and Nearby FPP & \parbox{2.2cm}{Probabilistic class prediction} & \parbox{3.5cm}{\textbf{Recovery Ambiguity Index (RAI)}} \\
+\textbf{Uncertainty Type} & None (Deterministic) & \parbox{2.2cm}{Aleatoric (Blend likelihoods)} & \parbox{2.2cm}{Aleatoric (Bayesian blend models)} & \parbox{2.2cm}{Aleatoric (Softmax output)} & \parbox{3.5cm}{\textbf{Epistemic (Vetting process degeneracy)}} \\
+\textbf{Astrophysical Focus} & Instrument anomalies & \parbox{2.2cm}{Stellar population synthesis} & \parbox{2.2cm}{Background EB contamination} & \parbox{2.2cm}{Transit shape morphology} & \parbox{3.5cm}{\textbf{Stellar activity \& period stability}} \\
+\textbf{Computational Footprint} & Low & \parbox{2.2cm}{Medium (minutes/candidate)} & \parbox{2.2cm}{High (hours/candidate)} & \parbox{2.2cm}{High (GPU needed)} & \parbox{3.5cm}{\textbf{Very Low ($RAI$ calculation requires $< 0.1$ s, $O(N^2)$ complexity)}} \\
+\enddata
+\end{deluxetable*}
+
+\subsection{Prior Vetting Stage Context} \label{sec:prior_stages}
+To understand how TARS v1 integrates with current automated pipelines, we must examine its dependency on Stages 1 and 2 of the exoplanet pipeline:
+\begin{itemize}
+\item \textbf{Stage 1 (Signal Conditioning) Operating Boundaries}: Detrending algorithms typically use high-pass filters or smoothing splines with a fixed window length (or knot spacing) to remove low-frequency stellar activity. If this window is too narrow, the planet transits themselves are attenuated, introducing false morphological variations. If the window is too wide, residual stellar activity remains, deforming the transit profile and generating harmonic period aliases.
+\item \textbf{Stage 2 (Transit Detection) Operating Limits}: The Box Least Squares (BLS) and Transit Least Squares (TLS) algorithms identify periodic signals by searching a grid of test periods. When the signal is weak (near the detection threshold of $\text{SDE} < 6.0$), the periodogram contains multiple competing peaks due to noise fluctuations. When the stellar noise is active and non-white (e.g. convective granulation), these peaks cluster near rotation harmonics. Traditional pipelines attempt to classify each peak independently, ignoring the global network structure of these aliases. TARS v1 directly addresses this by building a graph of these competing period peaks to evaluate signal uniqueness.
+\end{itemize}

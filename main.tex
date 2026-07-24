@@ -1,0 +1,45 @@
+\documentclass[twocolumn]{aastex701}
+
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage{graphicx}
+\usepackage{tikz}
+\usetikzlibrary{arrows,shapes,positioning,fit}
+\usepackage[ruled,vlined]{algorithm2e}
+
+\shorttitle{TARS: Transit Ambiguity Recovery System}
+\shortauthors{Gupta}
+\input{generated_defs}
+
+\begin{document}
+
+\title{Transit Ambiguity Recovery System (TARS): Isolating and Quantifying Signal Recovery Ambiguity in Exoplanet Vetting}
+
+\author{Roshan Kumar Gupta}
+\affiliation{Department of Computer Science \& Engineering, Chandigarh University, Mohali, Punjab, India}
+\email{roshankumargupta.sh@gmail.com}
+
+\input{sections/abstract}
+
+\keywords{methods: data analysis --- techniques: photometric --- planetary systems --- stars: activity}
+
+\input{sections/introduction}
+\input{sections/related_work}
+\input{sections/methodology}
+\input{sections/results}
+\input{sections/discussion}
+\input{sections/limitations}
+\input{sections/conclusion}
+\input{sections/appendix}
+
+\begin{acknowledgments}
+The authors acknowledge the use of public TESS data from the Mikulski Archive for Space Telescopes (MAST) at the Space Telescope Science Institute. We thank the Google DeepMind Advanced Agentic Coding team for computational resources and helpful discussions.
+\end{acknowledgments}
+
+\facility{TESS}
+\software{numpy \citep{Harris2020}, scipy \citep{Virtanen2020}, scikit-learn \citep{Pedregosa2011}, pandas \citep{McKinney2010}, pytest \citep{Krekel2004}}
+
+\bibliographystyle{aasjournalv7}
+\bibliography{references}
+
+\end{document}

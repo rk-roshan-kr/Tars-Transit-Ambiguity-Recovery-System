@@ -1,0 +1,19 @@
+# LaTeX build artifacts
+build/
+*.aux
+*.log
+*.out
+*.toc
+*.bbl
+*.blg
+*.synctex.gz
+*.fdb_latexmk
+*.fls
+
+# Scratch directories
+scratch/
+generated/
+
+# OS files
+.DS_Store
+Thumbs.db

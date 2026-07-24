@@ -1,0 +1,44 @@
+\section{Discussion} \label{sec:discussion}
+
+This section synthesizes our empirical results, analyzing the scientific, survey, operational, information-theoretic, and physical implications of the TARS v1 framework.
+
+\subsection{Scientific Implications: Isolating Epistemic Recovery Ambiguity} \label{sec:disc_epistemic}
+Exoplanet vetting conflates two distinct sources of uncertainty: aleatoric (is the source physical—a planet or binary?) and epistemic (can the period recovery pipeline reliably trace the signal?). Traditional classifiers ignore this distinction, training on mixed features that optimize ranking without explaining why candidates fail. 
+
+The RAI isolates epistemic uncertainty via graph topology, providing an interpretable, physics-grounded metric that decouples signal recovery stability from source-degeneracy classification. Rather than trying to resolve physical source degeneracies (such as background blending or eclipsing binaries) using light curve shapes alone, the RAI answers a different question: \textit{How reliably can we trace a unique transit ephemeris given the stellar activity profile and observation windows?} Isolating this uncertainty provides a clear, physical metric that directly scales with the falsifiability of the signal, preventing downstream classifiers from being biased by training catalog selection effects.
+
+\subsection{Survey Implications: TESS and PLATO Integration} \label{sec:disc_survey}
+Wide-field space missions generate vast quantities of time-series photometry, yielding tens of thousands of Threshold Crossing Events (TCEs) that exceed basic detection thresholds.
+\begin{itemize}
+\item \textbf{TESS Pipeline Application}: The TESS pipeline (e.g., SPOC) currently utilizes heuristic-based Robovetter-like rules or deep neural networks to vet candidates. Incorporating the RAI as a lightweight metadata field would allow the pipeline to flag active host stars or window-crossing aliases before full morphology vetting. This would significantly reduce the manual vetting workload.
+\item \textbf{PLATO Pipeline Alignment}: The upcoming PLATO mission, with its long baseline observations (up to several years per field) and multiple camera groups, will observe stars under varying window configurations. High-cadence monitoring will yield complex periodograms. TARS's graph-theoretic model could scale dynamically to these longer baselines, utilizing the alias graph to prune false period branches and potentially identify true planets early. Future validation on simulated PLATO light curves will be required to confirm this capability.
+\end{itemize}
+
+\subsection{Operational Implications: Follow-Up Optimization} \label{sec:disc_operational}
+High-resolution spectroscopic radial velocity (RV) follow-up and adaptive optics (AO) imaging are the primary bottlenecks in exoplanet confirmation. These resources are extremely limited.
+\begin{itemize}
+\item \textbf{Pre-Filtering and Ranking}: Currently, targets are prioritized based on simple signal-to-noise ratio (SNR) thresholds. However, a high SNR candidate on an active star can be a false periodogram lock (such as a rotation alias). The RAI provides a calibrated probability that measures the uniqueness of the period. By ranking candidates using $P(Y=1 \mid z_{\text{RAI}})$, observers can prioritize targets that have a unique, stable ephemeris.
+\item \textbf{Integrating with Vespa and Triceratops}: Running complex Bayesian FPP models like Vespa or Triceratops requires significant computing hours per candidate. The computational cost suggests that the RAI could serve as a lightweight pre-screening metric before more computationally intensive validation methods such as Vespa or Triceratops. Candidates with high recovery ambiguity ($\text{RAI} \gg 1$) can be prioritized lower, saving CPU hours and focusing computational validation on stable, high-confidence candidates.
+\end{itemize}
+
+\subsection{Information-Theoretic Implications: Parsimony vs. Overfitting} \label{sec:disc_parsimony}
+Our Conditional Mutual Information (CMI) audits and Forward Feature Selection sweeps (Section~\ref{sec:results_parsimony}) reveal a critical statistical trend: adding non-ambiguity features beyond a small core (e.g., beyond the 4th step of forward selection) systematically degrades the Blind Validation Partition AUROC from $0.6943$ down to $0.5868$.
+\begin{itemize}
+\item \textbf{Collinearity and Noise}: Traditional vetting pipelines include up to dozens of correlated features (such as multiple consistency metrics for depth, duration, and shape). During training, high-capacity models (such as deep neural networks or random forest ensembles) use these redundant features to fit subtle training set patterns. However, on the independent Blind Validation Partition, these features act as collinear noise, degrading generalization.
+\item \textbf{Parsimony Frontier}: By restricting the classification model to a single, Z-score standardized index (the RAI), TARS v1 achieves stable, comparable performance to complex ensembles. This demonstrates that transit vetting models can be substantially simplified while improving calibration.
+\end{itemize}
+
+\subsection{Physical Implications of Graph Entropy} \label{sec:disc_entropy}
+Graph entropy ($x_{\text{ent}}$) measures the structural complexity and dispersion of the alias network. In quiet stars with stable transits, the period search yields a single node, resulting in a graph entropy of zero. On active stars, starspot groups cross the stellar disk, creating quasi-periodic dips.
+\begin{itemize}
+\item \textbf{Spot Lifetime and Rotational Modulation}: Because starspots grow, decay, and migrate across latitudes on timescales of days to weeks, the periodic modulation shifts in phase and amplitude. This causes the transit search algorithm to lock onto multiple harmonics of the rotation period ($P_{\text{rot}}/2, 2 P_{\text{rot}}$, etc.) or beats between the rotation period and the window function.
+\item \textbf{Graph Topology}: These harmonics form a highly connected, structured subgraph in the alias network. The graph entropy directly measures this physical complexity: a dense, highly structured subgraph yields a lower entropy than a scattered, unstructured set of candidates. This provides a direct connection between the mathematical properties of the alias network and the physical processes in the stellar photosphere.
+\end{itemize}
+
+\subsection{Comparative Analysis with Prior Classifiers} \label{sec:disc_comparison}
+To highlight the parsimony and simplicity of TARS v1, we compare its structural characteristics with three primary baseline vetting pipelines:
+\begin{itemize}
+\item \textbf{Comparison with Robovetter (Heuristic)}: Robovetter applies a sequence of deterministic tests to morphological parameters. While highly interpretable, Robovetter relies on hard, non-differentiable thresholds. This makes it highly sensitive to calibration shifts in detrending splines. TARS v1, in contrast, translates continuous Z-score standardised features into a smooth logistic probability link, allowing for calibrated probabilistic grading of candidates near thresholds.
+\item \textbf{Comparison with Autovetter (Random Forest Ensemble)}: Autovetter trains a high-capacity random forest on 16 or more morphology and consistency features. Collinearity between features (such as depth and SNR) leads to decision tree overfitting and uncalibrated leaf probabilities. TARS v1 eliminates these correlations entirely by constructing a single parsimonious index, preventing decision tree overfitting.
+\item \textbf{Comparison with Astronet (Deep CNN)}: Astronet \citep{Shallue2018} trains a deep convolutional neural network directly on 1D phase-folded light curves. While Astronet achieves high validation AUROC on clean datasets, it is a black-box model that requires GPU acceleration and fails to calibrate under dataset covariate shifts. TARS v1 requires no deep model training, runs in $< 0.1$ seconds on a single CPU core, and remains fully interpretable.
+\end{itemize}

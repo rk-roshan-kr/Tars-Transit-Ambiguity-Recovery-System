@@ -1,0 +1,20 @@
+\begin{table}[htbp]
+\centering
+\caption{Data-Driven PCA Projections vs. Fixed Physical Sign Weights}
+\label{tab:pca_comparison}
+\begin{tabular}{lcc}
+\hline\hline
+Feature Sub-component & PC1 Weight & RAI Weight \\
+\hline
+FC stability & 0.4907 $\pm$ 0.0317 & +1 \\
+graph entropy & 0.5251 $\pm$ 0.0136 & +1 \\
+harmonic density & 0.4075 $\pm$ 0.0255 & +1 \\
+period uniqueness & -0.2572 $\pm$ 0.0289 & -1 \\
+candidate concentration & -0.5012 $\pm$ 0.0218 & -1 \\
+\hline
+Explained Variance Ratio & 0.6479 & N/A \\
+AUROC & 0.6668 & 0.6732 \\
+ECE & 0.0456 & 0.0644 \\
+\hline
+\end{tabular}
+\end{table}

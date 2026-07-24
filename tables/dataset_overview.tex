@@ -1,0 +1,16 @@
+\begin{table*}[htbp]
+\centering
+\caption{Dataset Partitions, Label Provenance, and Class Balance}
+\label{tab:dataset_overview}
+\begin{tabular}{llcccclcc}
+\hline\hline
+Partition & Role & Unique Stars & Light Curves & Label Provenance & $N_{\text{Planets}}$ & $N_{\text{FPs}}$ & Class Bal. \\
+\hline
+TRAIN & Model fitting & 408 & 1,253 & Mixed (NASA Archive + TFOP WG) & 749 & 504 & 59.78\% \\
+VALIDATION & Hyperparameter tuning & 47 & 105 & Mixed (NASA Archive + TFOP WG) & 62 & 43 & 59.05\% \\
+BLIND & Independent evaluation & 60 & 175 & Mixed (NASA Archive + TFOP WG) & 102 & 73 & 58.29\% \\
+\hline
+TARS-250K-R1 & Operational (unlabeled) & 129,383 & 250,010 & None & N/A & N/A & N/A \\
+\hline
+\end{tabular}
+\end{table*}

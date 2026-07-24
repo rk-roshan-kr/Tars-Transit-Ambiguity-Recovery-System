@@ -1,0 +1,41 @@
+\section{Limitations and Threats to Validity} \label{sec:limitations}
+
+This section details the limitations of the TARS v1 framework and evaluates potential threats to its validity. Isolating and documenting these boundaries is a requirement of the TARS Scientific Standard (TSS) v1.0, ensuring that our claims remain proportionate to the empirical evidence.
+
+\subsection{Validation Partition Limitations} \label{sec:limit_dataset}
+\begin{itemize}
+\item \textbf{TESS Cadence and Scope} (\textit{Limitation of the available data}): The empirical validation presented in this work is restricted to light curves observed by the Transiting Exoplanet Survey Satellite (TESS). TESS light curves are monitored at cadences of 2 minutes and 20 seconds. The short duration of TESS sector observations (typically 27 days per sector) limits our ability to evaluate recovery ambiguity on long-period candidates ($P > 20$ days) where transit events are sparse.
+\item \textbf{Sample Size and Class Balance} (\textit{Limitation of the current evaluation}): Our independent Blind Validation Partition consists of $N = \BlindLCCount$ light curves across $N_{\text{stars}} = \BlindStarCount$ unique systems. While this sample size is sufficient to establish ranking performance and calibration (AUROC = 0.6621), the small count of confirmed planets (Tier A targets) in the Blind Validation Partition leads to large standard errors and confidence intervals under bootstrap resampling.
+\end{itemize}
+
+\subsection{Physical Limitations} \label{sec:limit_physical}
+\begin{itemize}
+\item \textbf{Giant and Subgiant Host Stars} (\textit{Inherent limitation of TARS}): As demonstrated in Section~\ref{sec:results_cohorts}, the model exhibits performance collapse when evaluated on giant and subgiant host stars. These stars exhibit low-frequency convective granulation noise and photospheric oscillations. The Stage 3 period recovery algorithm misinterprets this convective noise as transits, leading to severe event inflation (46.07 events vs. 37.92 in dwarfs) and candidate multiplicity. This breaks the ambiguity assumptions of the RAI.
+\item \textbf{Transit Timing Variations (TTVs)} (\textit{Inherent limitation of TARS}): TARS assumes a rigid linear ephemeris ($t_k = T_0 + k \cdot P$). In dynamically active multi-planet systems, gravitational interactions between planets introduce Transit Timing Variations (TTVs). If these variations exceed our timing phase window, the stability engine fails to fit a linear ephemeris, resulting in the false rejection of true planet candidates (forensics register \texttt{FAILURE\_TIMING\_ERROR\_EXPLOSION}).
+\item \textbf{High-Frequency Pulsators and Eclipsing Binaries} (\textit{Inherent limitation of TARS}): Rapid stellar pulsations or eclipsing binaries with highly eccentric orbits and asymmetric depths can mimic or deform transit shapes, creating complex connected components in the alias network that distort graph entropy calculations.
+\end{itemize}
+
+\subsection{Methodological Limitations} \label{sec:limit_method}
+\begin{itemize}
+\item \textbf{Harmonic Search Boundaries} (\textit{Inherent limitation of TARS}): The harmonic matching algorithm is restricted to integer ratios $r \in \{2, 3, 4, 5\}$. While this covers the most common periodogram aliases, it fails to capture higher-order aliases (e.g., $r = 6$) or fractional aliases (e.g., $3/2$ or $4/3$ resonances).
+\item \textbf{Fixed Match Tolerance} (\textit{Inherent limitation of TARS}): The tolerance is fixed at $\epsilon = 0.05$. A wider tolerance would falsely link independent candidates, while a tighter tolerance would fail to link related aliases under timing scatter.
+\item \textbf{Frozen Standardization Statistics} (\textit{Limitation of the current evaluation}): The Z-score standardization parameters ($\mu_i, \sigma_i$) and logistic coefficients ($\beta_0 = 0.5410, \beta_1 = 0.1582$) are frozen from our training set partition. If the pipeline is deployed on stellar populations with significantly different noise profiles, these parameters may lose calibration.
+\end{itemize}
+
+\subsection{Statistical Limitations} \label{sec:limit_statistical}
+\begin{itemize}
+\item \textbf{Bootstrap Assumptions} (\textit{Limitation of the current evaluation}): Bootstrap resampling assumes that the empirical distribution of our Blind Validation Partition is a representative proxy for the true underlying population. If our Blind Validation Partition contains selection biases (e.g., over-representation of bright, high-SNR targets), the bootstrap confidence intervals will be overly optimistic.
+\item \textbf{Calibration and Discretization} (\textit{Limitation of the current evaluation}): Expected Calibration Error (ECE) is sensitive to the number of bins $M$ and the bin boundary locations. Conditional Mutual Information (CMI) calculation requires discrete partitions; while our sensitivity sweeps across $K \in [4, 20]$ show that the redundancy result is robust, CMI estimates can still be biased by finite-sample sizes.
+\end{itemize}
+
+\subsection{Computational Limitations} \label{sec:limit_computational}
+\begin{itemize}
+\item \textbf{$O(N^2)$ Graph Scaling} (\textit{Inherent limitation of TARS}): Pairwise period comparisons in the alias graph scale quadratically with candidate count. While the number of surviving candidates is small ($N_{\text{final}} < 200$), making the calculation extremely fast ($< 0.1$ s), scaling this to massive all-sky catalogs with un-pruned period grids may introduce computational bottlenecks.
+\end{itemize}
+
+\subsection{Threats to Validity} \label{sec:limit_threats}
+\begin{itemize}
+\item \textbf{Internal Validity} (\textit{Limitation of the current evaluation}): Threats include preprocessing assumptions (detrending spline timescales) and label quality. If the labels in the master registry contain misclassifications, the classification weights will be biased. Additionally, data gap dropouts can falsely truncate period networks, triggering \texttt{FAILURE\_GAP\_DROPOUT} forensic flags that distort stability counts.
+\item \textbf{External Validity} (\textit{Limitation of the current evaluation}): Threats concern the generalization of the frozen Z-score parameters to other stellar populations or instrument cadences. An instrument-specific shift in TESS systematics could invalidate the calibration slope. The present performance results should be interpreted as applying to the evaluated TESS Blind Validation Partition. Independent validation on the full Operational Corpus or additional missions (such as Kepler and PLATO) will be required before claims of cross-mission generalization can be made.
+\item \textbf{Construct Validity} (\textit{Inherent limitation of TARS}): Concerns whether the five sub-features fully capture ``recovery ambiguity.'' Alternate graph representations (e.g., directed graphs reflecting period search directions) or alternative entropy measures (e.g., Rényi or Tsallis entropy) could provide different representations of signal uncertainty.
+\end{itemize}
