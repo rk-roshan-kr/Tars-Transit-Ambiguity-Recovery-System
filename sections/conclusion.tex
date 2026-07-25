@@ -6,8 +6,8 @@ This work investigated whether exoplanet signal recovery ambiguity can be isolat
 \subsection{Supporting Evidence} \label{sec:concl_evidence}
 To answer this question, we introduced the \textbf{Recovery Ambiguity Index (RAI)}, constructed as a signed sum of five standardized graph-theoretic and harmonic features. We evaluated this index on the independent Blind Validation Partition (see Table~\ref{tab:dataset_overview} and Figure~\ref{fig:dataset_workflow}). The empirical results demonstrate that:
 \begin{itemize}
-\item The univariate RAI-only model achieves comparable ranking performance to complex 16-feature stacks, suggesting that, within the evaluated Blind Validation Partition and feature family, legacy features are statistically redundant once recovery ambiguity is controlled for.
-\item Information-theoretic sweeps of Conditional Mutual Information (CMI) confirm that legacy features contribute no unique predictive information after controlling for the RAI.
+\item The univariate RAI-only model achieves comparable ranking performance to complex 16-feature stacks, suggesting that, within the evaluated Blind Validation Partition and feature family, there is no detectable additional predictive information once recovery ambiguity is controlled for.
+\item Information-theoretic sweeps of Conditional Mutual Information (CMI) confirm that legacy features contribute no detectable unique predictive information after controlling for the RAI.
 \item The model exhibits linear, binned calibration, ensuring predicted probabilities correspond to empirical positive rates.
 \item The index decays gracefully under severe measurement noise and is absolutely invariant to systematic bias due to the rank-preserving properties of linear sums.
 \item Cohort audits locate the physical boundaries of the method, showing that giant star convective noise deforms the candidate graph topology and breaks the ambiguity-based period recovery assumptions.
@@ -19,7 +19,7 @@ Within the evaluated Blind Validation Partition and assumptions, we conclude tha
 \subsection{Future Research Program} \label{sec:concl_future}
 This work serves as the foundation for a longer-term research program investigating recovery ambiguity as a fundamental property of exoplanet candidate recovery:
 \begin{itemize}
-\item \textbf{Generalization and Invariance}: Future work will evaluate whether recovery ambiguity is an invariant property of transit detection across distinct observational domains. We will test the generalization of the ambiguity construct and the RAI estimator across different missions (e.g. Kepler, K2, and PLATO) and search pipelines.
+\item \textbf{Generalization and Invariance}: Future work will evaluate whether recovery ambiguity is an invariant property of transit detection across distinct observational domains. We will test the generalization of the ambiguity construct and the RAI estimator across different missions (e.g. Kepler, K2, and PLATO) and search pipelines. External validation across Kepler, K2, and future PLATO observations is planned.
 \item \textbf{Operational Science}: We will investigate whether incorporating ambiguity-aware prioritization produces measurable efficiency gains in exoplanet discovery programs, such as reducing telescope follow-up costs and optimizing candidate triage schedules.
 \item \textbf{Methodological Enhancements}: We plan to extend the Stage 3 stability engine to incorporate Transit Timing Variations (TTVs) in multi-planet systems, adapt Z-score standardization for giant stellar hosts, and evaluate directed graph representations to capture asymmetric timing uncertainties.
 \end{itemize}

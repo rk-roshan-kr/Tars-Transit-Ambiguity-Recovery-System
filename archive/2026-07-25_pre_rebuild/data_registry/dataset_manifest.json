@@ -1,0 +1,135 @@
+{
+  "_description": "TARS-250K-R1 — Frozen corpus manifest for Phase 10.2. This file is the authoritative governance record for the TARS 250K-star corpus.",
+  "_schema_version": "1.0",
+  "corpus": {
+    "completed_count": 250010,
+    "failed_count": 1500,
+    "fits_on_disk": 250011,
+    "note": "16284 PENDING records are queued for replacement download. Completed corpus has exceeded target.",
+    "pending_count": 16284,
+    "target_count": 250000,
+    "total_indexed": 267794
+  },
+  "dataset_version": "1.0",
+  "experimental_partitions": {
+    "BLIND": {
+      "class_balance_A_pct": 58.29,
+      "eval_lcs": 175,
+      "eval_tics": 60,
+      "tier_A": 102,
+      "tier_C": 73,
+      "total_lcs": 24994,
+      "total_tics": 13069
+    },
+    "OPTIMIZATION": {
+      "class_balance_A_pct": 0.0,
+      "eval_lcs": 0,
+      "eval_tics": 0,
+      "tier_A": 0,
+      "tier_C": 0,
+      "total_lcs": 25359,
+      "total_tics": 13108
+    },
+    "TRAIN": {
+      "class_balance_A_pct": 59.78,
+      "eval_lcs": 1253,
+      "eval_tics": 408,
+      "tier_A": 749,
+      "tier_C": 504,
+      "total_lcs": 175627,
+      "total_tics": 92163
+    },
+    "VALIDATION": {
+      "class_balance_A_pct": 59.05,
+      "eval_lcs": 105,
+      "eval_tics": 47,
+      "tier_A": 62,
+      "tier_C": 43,
+      "total_lcs": 24577,
+      "total_tics": 12984
+    }
+  },
+  "governance_authority": "Phase 10.2 — Dataset Governance, ML Architecture Integration & Corpus Freeze",
+  "governance_frozen_at": "2026-06-04T09:30:00Z",
+  "ingestion_db_sha256": "c5458b62d145271bec72f8936e4f48ffc5d5d893d5632e397b601d963c197723",
+  "ml_governance": {
+    "forbidden_inputs": [
+      "confidence_score",
+      "ambiguity_score",
+      "ranking_trace",
+      "physics_score",
+      "posterior_probability",
+      "posterior_category"
+    ],
+    "physics_veto_invariant": "Stage 5 ECHO FAIL cannot be overridden by Stage 6B output under any circumstances.",
+    "stage": "Stage 6B",
+    "training_permitted": false,
+    "training_permitted_note": "No ML training in Phase 10.2. Corpus is frozen for future Phase 11 training."
+  },
+  "next_release_id": "TARS-250K-R2",
+  "next_release_trigger": "Sectors 15+ ingestion complete, or quality policy revision",
+  "provenance": {
+    "cadence_seconds": 120,
+    "cadence_type": "SPOC_2MIN",
+    "data_source": "MAST (Mikulski Archive for Space Telescopes)",
+    "database_file": "E:\\dataset\\tars\\ingestion_tracker.db",
+    "ingestion_engine": "tars_infra.ingest.IngestionPipeline",
+    "ingestion_engine_version": "1.0",
+    "mast_query_filter": "obs_collection=TESS, dataproduct_type=timeseries, t_exptime=[119.0, 121.0], productSubGroupDescription=LC",
+    "mission": "TESS",
+    "sector_max": 14,
+    "sector_min": 1,
+    "storage_path": "E:\\dataset\\tars",
+    "tess_sectors_covered": [
+      1,
+      2,
+      3,
+      4,
+      5,
+      6,
+      7,
+      8,
+      9,
+      10,
+      11,
+      12,
+      13,
+      14
+    ]
+  },
+  "quality_distribution": {
+    "grade_A": 109573,
+    "grade_A_pct": 43.83,
+    "grade_B": 138580,
+    "grade_B_pct": 55.43,
+    "grade_C": 1857,
+    "grade_C_pct": 0.74,
+    "grade_F_discarded": 1500,
+    "policy": "Grade A, B, C admitted. Grade F discarded at download time."
+  },
+  "quality_thresholds": {
+    "grade_A_min_cadences": 16000,
+    "grade_B_min_cadences": 12000,
+    "grade_C_min_cadences": 8000,
+    "grade_F_threshold": "below_C"
+  },
+  "release_id": "TARS-250K-R1",
+  "release_name": "TARS 250K Star Corpus — Release 1",
+  "reproducibility": {
+    "dataset_governance_spec": "DATASET_GOVERNANCE_SPEC.md",
+    "feature_registry_version": "BEI_FEATURE_ADMISSION_REGISTRY_v1",
+    "likelihood_registry_version": "BEI_LIKELIHOOD_REGISTRY_v1",
+    "manifest_sha256": "PENDING — computed by DatasetRegistry on first load after freeze",
+    "pipeline_commit_hash": "PENDING — freeze after next git tag"
+  },
+  "split_policy": {
+    "blind_fraction": 0.1,
+    "description": "Dataset splits are assigned by DatasetRegistry. Splits are frozen once assigned and never regenerated.",
+    "optimization_fraction": 0.1,
+    "stratification": "By sector, then by quality grade",
+    "test_lock_policy": "Blind Benchmark split is sealed. No development-time access permitted.",
+    "train_fraction": 0.7,
+    "validation_fraction": 0.1
+  },
+  "status": "FROZEN"
+}

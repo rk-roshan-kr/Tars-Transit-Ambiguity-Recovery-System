@@ -8,7 +8,7 @@
 
 **Objective**: We present a method that isolates and estimates exoplanet signal recovery ambiguity through a single, physically interpretable graph-derived index—the Recovery Ambiguity Index (RAI)—simplifying transit vetting while improving calibration.
 
-**Methods**: We introduce the **Recovery Ambiguity Index (RAI)**, a parsimonious index constructed from five standardized graph-theoretic and harmonic sub-features that capture the dispersion and connection of period aliases. We evaluate a univariate logistic model using only the RAI against multi-feature ensembles on an independent blind validation partition consisting of $N = 175$ TESS light curves across $N_{\text{stars}} = 60$ unique systems.
+**Methods**: We introduce the **Recovery Ambiguity Index (RAI)**, a parsimonious index constructed from five standardized graph-theoretic and harmonic sub-features that capture the dispersion and connection of period aliases. We evaluate a univariate logistic model using only the RAI against multi-feature ensembles on an independent blind validation partition consisting of $N = 175$ TESS light curves across $N_{\text{stars}} = 60$ unique systems. Performance metrics are computed exclusively on the labeled benchmark partitions; the operational corpus is used only for deployment and candidate ranking.
 
 **Principal Findings**: Evaluated exclusively on the independent Blind Validation Partition, the univariate RAI-only model achieves statistically indistinguishable ranking performance ($\Delta\,\text{AUROC} = 0.0378$, 95\% CI $[-0.0089, 0.1386]$) relative to a complex 16-feature Linear Stack, while substantially improving calibration (Expected Calibration Error is 24% lower: $0.0646$ vs. $0.0854$) and reducing feature dimensionality by 93.75%. Information-theoretic audits of Conditional Mutual Information (CMI) confirm that legacy feature families contain no unique predictive information after controlling for the RAI ($p \ge 0.20$ across bin counts $K \in [4, 20]$). Robustness audits demonstrate that the signed sum structure of the RAI decays gracefully under noise and is absolutely invariant to systematic measurement bias. Physical cohort failure analysis reveals that convective noise on giant host stars deforms the candidate graph topology, defining the physical boundary of the index's applicability.
 
@@ -133,7 +133,7 @@ Many existing vetting pipelines primarily optimize classification performance ra
 
 In this work, we present **TARS v1** (Transit Ambiguity Recovery System), a parsimonious framework that isolates and quantifies exoplanet recovery ambiguity. Rather than relying on a large machine learning model with dozens of features, we introduce the **Recovery Ambiguity Index (RAI)**, an unsupervised index constructed as a signed sum of five standardized graph-theoretic and harmonic features. The RAI directly measures the epistemic uncertainty of signal recovery by analyzing period recovery stability, alias graph entropy, harmonic density, period uniqueness, and candidate concentration.
 
-We show that this single-feature index achieves comparable ranking performance to complex multi-feature stacks on our blind evaluation dataset partition (consisting of $N=154$ TESS light curves across $N_{\text{stars}}=60$ independent stellar systems). We demonstrate through information-theoretic conditional mutual information (CMI) sweeps that, within the evaluated validation protocol, legacy stellar activity features do not contribute detectable unique predictive information after controlling for the RAI. This suggests that transit vetting pipelines could be substantially simplified under equivalent noise regimes while maintaining calibration reliability.
+We show that this single-feature index achieves comparable ranking performance to complex multi-feature stacks on our blind evaluation dataset partition (consisting of $N=175$ TESS light curves across $N_{\text{stars}}=60$ independent stellar systems). We demonstrate through information-theoretic conditional mutual information (CMI) sweeps that, within the evaluated validation protocol, legacy stellar activity features do not contribute detectable unique predictive information after controlling for the RAI. This suggests that transit vetting pipelines could be substantially simplified under equivalent noise regimes while maintaining calibration reliability.
 
 ---
 
@@ -440,7 +440,7 @@ A CMI value close to zero indicates that legacy features are statistically redun
 
 ## 4. Results
 
-This section presents the empirical validation of the TARS v1 framework. All results are evaluated on our independent, blind evaluation dataset partition consisting of $N = 154$ TESS light curves across $N_{\text{stars}} = 60$ unique systems.
+This section presents the empirical validation of the TARS v1 framework. All results are evaluated on our independent, blind evaluation dataset partition consisting of $N = 175$ TESS light curves across $N_{\text{stars}} = 60$ unique systems.
 
 ---
 
@@ -473,7 +473,7 @@ To ensure the scientific defensibility of our findings, we execute a structured 
 
 - **Statistical Interpretation**: Within the uncertainty of this evaluation, the univariate RAI-only model achieves comparable ranking performance to the multi-feature models, while simultaneously reducing the classification feature count by 93.75% (from 16 features to a single index). The RAI-only model also exhibits the lowest standard deviation ($\sigma = 0.0694$) and variance ($0.004820$) across evaluations.
 - **Scientific Implications**: These observations indicate that recovery ambiguity is a useful indicator of candidate reliability. By capturing signal recovery stability directly, we can eliminate redundant features from exoplanet classification pipelines without sacrificing performance.
-- **Limitations**: The blind partition consists of $N = 154$ light curves, resulting in wide confidence intervals that span from $0.5254$ to $0.7833$.
+- **Limitations**: The blind partition consists of $N = 175$ light curves, resulting in wide confidence intervals that span from $0.5254$ to $0.7833$.
 - **Connection**: This performance establishes that the parsimonious index retains sufficient discriminative power to act as a stand-alone vetting metric.
 
 ---
@@ -729,7 +729,7 @@ This section details the limitations of the TARS v1 framework and evaluates pote
 ### 6.1. Dataset Limitations
 
 - **TESS Cadence and Scope** (_Limitation of the available data_): The empirical validation presented in this work is restricted to light curves observed by the Transiting Exoplanet Survey Satellite (TESS). TESS light curves are monitored at cadences of 2 minutes and 20 seconds. The short duration of TESS sector observations (typically 27 days per sector) limits our ability to evaluate recovery ambiguity on long-period candidates ($P > 20$ days) where transit events are sparse.
-- **Sample Size and Class Balance** (_Limitation of the current evaluation_): Our blind evaluation partition consists of $N = 154$ light curves across $N_{\text{stars}} = 60$ unique systems. While this sample size is sufficient to establish ranking performance and calibration (AUROC = 0.6621), the small count of confirmed planets (Tier A targets) in the blind partition leads to large standard errors and confidence intervals under bootstrap resampling.
+- **Sample Size and Class Balance** (_Limitation of the current evaluation_): Our blind evaluation partition consists of $N = 175$ light curves across $N_{\text{stars}} = 60$ unique systems. While this sample size is sufficient to establish ranking performance and calibration (AUROC = 0.6621), the small count of confirmed planets (Tier A targets) in the blind partition leads to large standard errors and confidence intervals under bootstrap resampling.
 
 ---
 
@@ -765,7 +765,7 @@ This section details the limitations of the TARS v1 framework and evaluates pote
 ### 6.6. Threats to Validity
 
 - **Internal Validity** (_Limitation of the current evaluation_): Threats include preprocessing assumptions (detrending spline timescales) and label quality. If the labels in the master registry contain misclassifications, the classification weights will be biased. Additionally, data gap dropouts can falsely truncate period networks, triggering `FAILURE_GAP_DROPOUT` forensic flags that distort stability counts.
-- **External Validity** (_Limitation of the current evaluation_): Threats concern the generalization of the frozen Z-score parameters to other stellar populations or instrument cadences. An instrument-specific shift in TESS systematics could invalidate the calibration slope. The present results should be interpreted as applying to the evaluated TESS dataset. Independent validation on additional missions (such as Kepler and PLATO) will be required before claims of cross-mission generalization can be made.
+- **External Validity** (_Limitation of the current evaluation_): Threats concern the generalization of the frozen Z-score parameters to other stellar populations or instrument cadences. An instrument-specific shift in TESS systematics could invalidate the calibration slope. The present results should be interpreted as applying to the evaluated TESS dataset. Independent validation on additional missions (such as Kepler and PLATO) will be required before claims of cross-mission generalization can be made. External validation across Kepler, K2, and future PLATO observations is planned.
 - **Construct Validity** (_Inherent limitation of TARS_): Concerns whether the five sub-features fully capture "recovery ambiguity." Alternate graph representations (e.g., directed graphs reflecting period search directions) or alternative entropy measures (e.g., Rényi or Tsallis entropy) could provide different representations of signal uncertainty.
 
 ---
@@ -782,8 +782,8 @@ This work investigated whether exoplanet signal recovery ambiguity can be isolat
 
 To answer this question, we introduced the **Recovery Ambiguity Index (RAI)**, constructed as a signed sum of five standardized graph-theoretic and harmonic features. We evaluated this index on an independent, blind evaluation partition of TESS light curves. The empirical results demonstrate that:
 
-- The univariate RAI-only model achieves comparable ranking performance to complex 16-feature stacks, suggesting that, within the evaluated dataset and feature family, legacy features are statistically redundant once recovery ambiguity is controlled for.
-- Information-theoretic sweeps of Conditional Mutual Information (CMI) confirm that legacy features contribute no unique predictive information after controlling for the RAI.
+- The univariate RAI-only model achieves comparable ranking performance to complex 16-feature stacks, suggesting that, within the evaluated dataset and feature family, there is no detectable additional predictive information once recovery ambiguity is controlled for.
+- Information-theoretic sweeps of Conditional Mutual Information (CMI) confirm that legacy features contribute no detectable unique predictive information after controlling for the RAI.
 - The model exhibits linear, binned calibration, ensuring predicted probabilities correspond to empirical positive rates.
 - The index decays gracefully under severe measurement noise and is absolutely invariant to systematic bias due to the rank-preserving properties of linear sums.
 - Cohort audits locate the physical boundaries of the method, showing that giant star convective noise deforms the candidate graph topology and breaks the ambiguity-based period recovery assumptions.

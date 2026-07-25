@@ -1,6 +1,6 @@
 \section{Results} \label{sec:results}
 
-This section presents the empirical validation of the TARS v1 framework. All results reported in this section are evaluated exclusively on our independent, manually labeled Blind Validation Partition (see Table~\ref{tab:dataset_overview} and Figure~\ref{fig:dataset_workflow} in Section~\ref{sec:method_dataset_overview}) consisting of $N = 154$ TESS light curves across $N_{\text{stars}} = 60$ unique systems.
+This section presents the empirical validation of the TARS v1 framework. All results reported in this section are evaluated exclusively on our independent, manually labeled Blind Validation Partition (see Table~\ref{tab:dataset_overview} and Figure~\ref{fig:dataset_workflow} in Section~\ref{sec:method_dataset_overview}) consisting of $N = \BlindLCCount$ TESS light curves across $N_{\text{stars}} = \BlindStarCount$ unique systems.
 
 \subsection{Validation Campaign Hierarchy} \label{sec:results_hierarchy}
 To ensure the scientific defensibility of our findings, we execute a structured validation hierarchy:
@@ -127,7 +127,7 @@ We calculate the Conditional Mutual Information (CMI) on the Blind Validation Pa
 \enddata
 \end{deluxetable*}
 
-Across all bin configurations, the observed CMI remains statistically non-significant ($p \ge 0.20$ in all cases). These results are consistent with the hypothesis that legacy feature families are statistically redundant. The information-theoretic sweep suggests that once signal recovery ambiguity is captured by the RAI, additional classifier features contribute no unique predictive information.
+Across all bin configurations, the observed CMI remains statistically non-significant ($p \ge 0.20$ in all cases). These results suggest that there is no detectable additional predictive information within this evaluated feature set and validation protocol once signal recovery ambiguity is controlled. The information-theoretic sweep suggests that once signal recovery ambiguity is captured by the RAI, additional classifier features do not contribute statistically significant unique information within the evaluated sample.
 
 The CMI sensitivity sweep is plotted in Figure~\ref{fig:cmi_sweep} (Supplement).
 
