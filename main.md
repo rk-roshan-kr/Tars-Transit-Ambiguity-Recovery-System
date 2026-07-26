@@ -694,19 +694,13 @@ High-resolution spectroscopic radial velocity (RV) follow-up and adaptive optics
 
 ### 5.4. Information-Theoretic Implications: Parsimony vs. Overfitting
 
-Our Conditional Mutual Information (CMI) audits and Forward Feature Selection sweeps (Section 4.10) reveal a critical statistical trend: adding non-ambiguity features beyond a small core (e.g., beyond the 4th step of forward selection) systematically degrades the blind set AUROC from $0.6943$ down to $0.5868$.
-
-- **Collinearity and Noise**: Traditional vetting pipelines include up to dozens of correlated features (such as multiple consistency metrics for depth, duration, and shape). During training, high-capacity models (such as deep neural networks or random forest ensembles) use these redundant features to fit subtle training set patterns. However, on the blind validation set, these features act as collinear noise, degrading generalization.
-- **Parsimony Frontier**: By restricting the classification model to a single, Z-score standardized index (the RAI), TARS v1 achieves stable, comparable performance to complex ensembles. This demonstrates that transit vetting models can be substantially simplified while improving calibration.
+Our Conditional Mutual Information (CMI) audits and Forward Feature Selection sweeps (Section 4.10) reveal a critical statistical trend: adding non-ambiguity features beyond a small core systematically degrades the blind set AUROC from $0.6943$ down to $0.5868$. Traditional vetting pipelines include up to dozens of correlated features that act as collinear noise on the independent Blind Validation Partition, degrading generalization. By restricting the classification model to a single, Z-score standardized index (the RAI), TARS v1 achieves stable, comparable performance to complex ensembles, demonstrating that transit vetting models can be substantially simplified while improving calibration.
 
 ---
 
 ### 5.5. Physical Implications of Graph Entropy
 
-Graph entropy ($x_{\text{ent}}$) measures the structural complexity and dispersion of the alias network. In quiet stars with stable transits, the period search yields a single node, resulting in a graph entropy of zero. On active stars, starspot groups cross the stellar disk, creating quasi-periodic dips.
-
-- **Spot Lifetime and Rotational Modulation**: Because starspots grow, decay, and migrate across latitudes on timescales of days to weeks, the periodic modulation shifts in phase and amplitude. This causes the transit search algorithm to lock onto multiple harmonics of the rotation period ($P_{\text{rot}}/2, 2 P_{\text{rot}}$, etc.) or beats between the rotation period and the window function.
-- **Graph Topology**: These harmonics form a highly connected, structured subgraph in the alias network. The graph entropy directly measures this physical complexity: a dense, highly structured subgraph yields a lower entropy than a scattered, unstructured set of candidates. This provides a direct connection between the mathematical properties of the alias network and the physical processes in the stellar photosphere.
+Graph entropy ($x_{\text{ent}}$) measures the structural complexity and dispersion of the alias network. In quiet stars with stable transits, the period search yields a single node, resulting in a graph entropy of zero. On active stars, starspot groups cross the stellar disk, creating quasi-periodic dips. Because starspots grow, decay, and migrate across latitudes on timescales of days to weeks, the periodic modulation shifts phase and amplitude. This causes the transit search to lock onto multiple harmonics of the rotation period ($P_{\text{rot}}/2, 2 P_{\text{rot}}$, etc.) or window function beats. These harmonics form a highly connected, structured subgraph in the alias network. Graph entropy directly measures this physical complexity: a dense, highly structured subgraph yields a lower entropy than a scattered, unstructured set of candidates, linking the mathematical properties of the network directly to physical stellar photosphere activity.
 
 ---
 
@@ -714,9 +708,20 @@ Graph entropy ($x_{\text{ent}}$) measures the structural complexity and dispersi
 
 To highlight the parsimony and simplicity of TARS v1, we compare its structural characteristics with three primary baseline vetting pipelines:
 
-- **Comparison with Robovetter (Heuristic)**: Robovetter applies a sequence of deterministic tests to morphological parameters. While highly interpretable, Robovetter relies on hard, non-differentiable thresholds. This makes it highly sensitive to calibration shifts in detrending splines. TARS v1, in contrast, translates continuous Z-score standardised features into a smooth logistic probability link, allowing for calibrated probabilistic grading of candidates near thresholds.
-- **Comparison with Autovetter (Random Forest Ensemble)**: Autovetter trains a high-capacity random forest on 16 or more morphology and consistency features. Collinearity between features (such as depth and SNR) leads to decision tree overfitting and uncalibrated leaf probabilities. TARS v1 eliminates these correlations entirely by constructing a single parsimonious index, preventing decision tree overfitting.
-- **Comparison with Astronet (Deep CNN)**: Astronet trains a deep convolutional neural network directly on 1D phase-folded light curves. While Astronet achieves high validation AUROC on clean datasets, it is a black-box model that requires GPU acceleration and fails to calibrate under dataset covariate shifts. TARS v1 requires no deep model training, runs in $< 0.1$ seconds on a single CPU core, and remains fully interpretable.
+- **Robovetter (Heuristic)**: Relies on hard, non-differentiable thresholds sensitive to calibration shifts in detrending. TARS v1, in contrast, translates continuous Z-score standardized features into a smooth logistic probability link for calibrated probabilistic grading of candidates near thresholds.
+- **Autovetter (Random Forest Ensemble)**: Autovetter trains a high-capacity random forest on 16 or more morphology and consistency features, where collinearity leads to decision tree overfitting and uncalibrated probabilities. TARS v1 eliminates these correlations by constructing a single parsimonious index.
+- **Astronet (Deep CNN)**: Astronet trains a deep convolutional neural network directly on 1D phase-folded light curves. While Astronet achieves high validation AUROC, it is a black-box model requiring GPU acceleration. TARS v1 requires no deep model training, runs in $< 0.1$ seconds on a single CPU core, and remains fully interpretable.
+
+---
+
+### 5.7. Stewardship and Scientific Value of the TARS-250K-R1 Corpus
+
+Rather than treating the TARS-250K-R1 operational corpus simply as a validation of pipeline throughput, we position this 250,010-target dataset as a foundational scientific infrastructure supporting several distinct avenues of future astronomical research:
+
+1. **Stellar Ambiguity Atlas**: By computing the RAI for every recovered transit candidate, we compile a public "ambiguity atlas" mapping period, graph entropy, harmonic density, and recovery confidence. This provides the community with a reusable catalog to study how signal recovery degeneracies correlate with host star parameters (crowding, magnitude, temperature, and Galactic latitude).
+2. **Targeted Follow-up Engine**: The pipeline filters the 250,010 stars down to 775 candidates, which are ranked by the RAI to yield the top 100 high-confidence discoveries. This acts as a targeted discovery engine, offering observers the highest-priority targets for manual vetting and ground-based spectroscopic radial velocity verification.
+3. **Open Vetting Benchmarks**: Freezing these ambiguity scores establishes an open reference benchmark. Other transit detection search engines (e.g., box-fitting or deep learning models) can run on this standardized corpus to directly compare period-recovery rates, alias-rejection boundaries, and calibration reliability.
+4. **Cross-Mission and Time-Series Analyses**: The RAI framework can be applied to Kepler, K2, and simulated PLATO datasets to study how ambiguity shifts across instruments. Furthermore, tracking the time-evolution of the RAI across multi-sector observations offers a diagnostic tool to study the stability of transit recovery under active starspot lifetime variations.
 
 ---
 
