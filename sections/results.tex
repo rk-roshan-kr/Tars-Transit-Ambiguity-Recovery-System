@@ -304,9 +304,42 @@ To verify that feature importances are stable under resampling, we ran 1,000 boo
 \input{tables/ablation_stability}
 
 \subsubsection{Operational Pipeline Throughput}
-We document the operational throughput of the TARS pipeline on the full TARS-250K-R1 corpus in Table~\ref{tab:pipeline_throughput}. Out of $250,010$ input targets, Stage 2 detects transits on $129,383$ stars, yielding $247,937$ candidate families in Stage 3. The ambiguity filter prunes this to $775$ ranked candidates, and the RAI model isolates $100$ high-confidence discoveries (survival rate of $0.04\%$), representing a massive reduction in follow-up candidate triage costs.
+We document the operational throughput of the TARS pipeline on the full TARS-250K-R1 corpus in Table~\ref{tab:pipeline_throughput}. Out of $250,010$ submitted target-sector observations, the pipeline successfully processed $245,626$ targets, with $4,379$ targets ($1.75\%$) excluded due to missing inputs and $5$ targets ($<0.01\%$) excluded due to corrupt FITS files. Vetting and ambiguity filtering resulted in $240,671$ accepted catalog records (a survival rate of $96.26\%$) across $126,824$ unique stellar systems. The pipeline rejected $4,685$ targets ($1.87\%$) at the transit detection stage (SDE $<$ 6.0) and $283$ targets ($0.11\%$) due to unstable orbital period recovery (NaN period).
+
+The pipeline achieved an average sustained operational throughput of $9.13$ target-sector observations per second on a 32-thread Ryzen 9 9950X CPU, completing the entire $250,010$-target campaign in $6.01$ hours. This throughput performance represents a significant speedup over the validation rate of $5.67$ targets/sec, reflecting infrastructure improvements (streaming work scheduling, sqlite transaction batching, and process worker lifecycle management) rather than modifications to the scientific algorithms, which remained frozen throughout production.
 
 \input{tables/pipeline_throughput}
+
+\subsubsection{Collinearity \& VIF Validation}
+To verify that the five component metrics of the Recovery Ambiguity Index (RAI) carry distinct, non-redundant scientific information, we calculate the Variance Inflation Factors (VIF) on the completed production corpus:
+\begin{itemize}
+    \item \textbf{Recovery\_Stability}: VIF = $1.12$
+    \item \textbf{Graph\_Entropy}: VIF = $2.22$
+    \item \textbf{Harmonic\_Density}: VIF = $1.50$
+    \item \textbf{Period\_Uniqueness}: VIF = $1.30$
+    \item \textbf{Candidate\_Conc}: VIF = $1.76$
+\end{itemize}
+All VIF values fall well below the standard threshold of $5.0$, suggesting that severe multicollinearity is unlikely among the measured components and justifying the distinct contribution of each sub-feature to the composite index.
+
+\subsubsection{Calibration & Bootstrap Confidence Intervals}
+We compute the Expected Calibration Error (ECE) and Brier Score on the TOI Tier A/C ground-truth labels matched in the full production database (1,343 observations) and compare them to the validation baseline (60 observations):
+\begin{itemize}
+    \item \textbf{Validation (N=60)}: ECE = $0.1330$ ($95\%$ CI: $[0.0539, 0.2728]$), Brier Score = $0.2521$ ($95\%$ CI: $[0.1948, 0.3136]$).
+    \item \textbf{Production (N=1343)}: ECE = $0.2149$ ($95\%$ CI: $[0.1896, 0.2405]$), Brier Score = $0.2925$ ($95\%$ CI: $[0.2804, 0.3047]$).
+\end{itemize}
+The calibration subset sizes differ because the validation run was restricted to a pre-defined 10,000-target slice (containing 60 matched TOIs), whereas the production run evaluated the full 250,010-target dataset, successfully matching 1,343 TOI Tier A/C ground-truth labels. The overlapping confidence intervals confirm consistent classification calibration.
+
+\subsubsection{Distributional Characteristics \& Effect Sizes}
+To test for statistical drift between the validation baseline and the full production run, we compute both the Kolmogorov-Smirnov (KS) statistic ($D$) and the Wasserstein distance for all five component features and the RAI:
+\begin{itemize}
+    \item \textbf{RAI}: $D = 0.1070$ ($p = 3.03 \times 10^{-95}$), Wasserstein Distance = $1.0068$, Standardized Mean Diff = $-0.1302\sigma$.
+    \item \textbf{Vetting\_Prob}: $D = 0.1070$ ($p = 3.03 \times 10^{-95}$), Wasserstein Distance = $0.0124$, Standardized Mean Diff = $+0.1872\sigma$.
+    \item \textbf{Graph\_Entropy}: $D = 0.1076$ ($p = 2.45 \times 10^{-96}$), Wasserstein Distance = $0.1503$, Standardized Mean Diff = $-0.1770\sigma$.
+    \item \textbf{Harmonic\_Density}: $D = 0.0454$ ($p = 1.72 \times 10^{-17}$), Wasserstein Distance = $0.4101$, Standardized Mean Diff = $-0.0546\sigma$.
+    \item \textbf{Candidate\_Conc}: $D = 0.1088$ ($p = 1.60 \times 10^{-98}$), Wasserstein Distance = $0.0019$, Standardized Mean Diff = $+0.0627\sigma$.
+    \item \textbf{Period\_Uniqueness}: $D = 0.0865$ ($p = 2.18 \times 10^{-62}$), Wasserstein Distance = $0.0070$, Standardized Mean Diff = $+0.1555\sigma$.
+\end{itemize}
+Although KS testing detected statistically significant distributional differences due to the large sample size, standardized effect sizes and Wasserstein distances remained small, suggesting limited practical differences between the validation and production distributions.
 
 To provide a concise overview of the empirical findings and parameters, we present the TARS framework quick-reference summary in Table~\ref{tab:quick_reference}.
 

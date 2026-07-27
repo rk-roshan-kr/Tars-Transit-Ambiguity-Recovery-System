@@ -298,3 +298,14 @@ A CMI value close to zero indicates that legacy features are statistically redun
     \item Compute the CMI sensitivity sweeps and calibration curves on the Blind Validation Partition.
     \end{enumerate}
 \end{itemize}
+
+\subsection{Scientific Freeze and High-Throughput Production Infrastructure} \label{sec:method_freeze_infrastructure}
+During production optimization, all scientific algorithms, feature extraction routines, model parameters, numerical precision, and decision thresholds were frozen. Only infrastructure components---including scheduling, checkpointing, database operations, logging, and input validation---were modified.
+
+To scale the TARS vetting pipeline to the full $250,010$ target-sector observations, we engineered a high-throughput parallel execution infrastructure:
+\begin{itemize}
+    \item \textbf{Parallel Work Queue}: Spawns worker processes using Python's \texttt{ProcessPoolExecutor} (31 workers on a 32-thread AMD Ryzen 9 9950X CPU). To prevent memory exhaustion and IPC deadlocks from pre-allocating the entire target list, a bounded streaming queue was implemented, maintaining a maximum task buffer of $2 \times N_{\text{workers}}$ in flight.
+    \item \textbf{Database Persistence \& Checkpointing}: Database writes are batched in transaction blocks of 100 records and committed via \texttt{INSERT OR REPLACE} transactions to SQLite. Operational progress is serialized to a JSON checkpoint file every 500 targets, enabling instant, lossless recovery from system interruptions.
+    \item \textbf{Fault Isolation \& Logging}: Inputs are pre-validated before processing. Missing file paths are intercepted and classified under data availability exclusions (\texttt{ERR\_MISSING\_INPUT}), while unreadable or truncated FITS files are isolated under \texttt{ERR\_PIPELINE\_CRASH} with their SHA-256 checksums logged. This prevents subprocess failures from polluting scientific metrics or stopping execution.
+    \item \textbf{Version Archival}: The complete code, configurations, database state, and log outputs corresponding to the production run are version-locked under Git commit \texttt{78619c3} and tagged as \texttt{TARS-v1.0-Reference-Implementation} to serve as the absolute baseline for all future algorithmic development.
+\end{itemize}

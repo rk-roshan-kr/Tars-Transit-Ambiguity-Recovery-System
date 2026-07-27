@@ -43,3 +43,27 @@ Rather than treating the TARS-250K-R1 operational corpus simply as a validation 
 \item \textbf{Open Vetting Benchmarks}: Freezing these ambiguity scores establishes an open reference benchmark. Other transit detection search engines (e.g., box-fitting or deep learning models) can run on this standardized corpus to directly compare period-recovery rates, alias-rejection boundaries, and calibration reliability.
 \item \textbf{Cross-Mission and Time-Series Analyses}: The RAI framework can be applied to Kepler, K2, and simulated PLATO datasets to study how ambiguity shifts across instruments. Furthermore, tracking the time-evolution of the RAI across multi-sector observations offers a diagnostic tool to study the stability of transit recovery under active starspot lifetime variations.
 \end{enumerate}
+
+\subsection{Engineering vs. Astrophysical Distinctions} \label{sec:disc_eng_vs_astro}
+It is critical to distinguish the engineering accomplishments of this campaign from the resulting astrophysical claims:
+\begin{itemize}
+    \item \textbf{Engineering Conclusions}: The TARS pipeline can execute reproducibly at scale on a Ryzen 9 9950X architecture, achieving a sustained operational throughput of $9.13$ targets/sec with robust checkpointing, memory-bounded worker queue management, and automated fault isolation. No software crashes occurred during the production execution, and all data provenance anomalies were successfully captured under data availability rejections.
+    \item \textbf{Astrophysical Claims}: The computed Recovery Ambiguity Index (RAI) is a mathematically consistent representation of alias graph complexity and period-recovery dispersion. However, while we have demonstrated that its five underlying features are not strongly collinear ($VIF < 2.50$) and correlate with manual vetting labels, we do not claim that the RAI has confirmed new exoplanets in this work. Resolving the physical nature of these candidates (e.g. distinguishing planets from astrophysical false positives such as grazing eclipsing binaries or blended stars) requires follow-up spectroscopy, radial velocity measurements, and catalog cross-matching.
+\end{itemize}
+
+\subsection{Threats to Validity} \label{sec:disc_threats_to_validity}
+
+\subsubsection{Internal Validity}
+*   \textbf{Data Availability Constraints}: Exclusions due to missing files ($1.75\%$) are derived directly from null-path records in the upstream database rather than execution crashes in the transit-vetting algorithm.
+*   \textbf{FITS File Integrity}: The five isolated corrupt inputs represent a negligible data loss rate ($0.002\%$) and do not impact global statistical distributions.
+
+\subsubsection{External Validity}
+*   \textbf{Hardware and Storage Dependencies}: Operational throughput was measured under a specific Ryzen 9 9950X CPU, local SSD storage, and local SQLite database engine configuration. Performance characteristics may shift significantly under network-attached filesystems or distributed relational databases.
+*   \textbf{Instrument Constraints}: The pipeline was evaluated exclusively on TESS Sector 1--14 light curves.
+
+\subsubsection{Construct Validity}
+*   \textbf{RAI Metric Formulation}: The RAI represents a specific, physical signed-sum configuration of five features. Alternative definitions of signal recovery ambiguity may exist and yield different relative rankings.
+
+\subsubsection{Statistical Validity}
+*   \textbf{Statistical Significance Sensitivity}: Due to the extremely large sample size ($N \approx 250\text{k}$), standard hypothesis tests (such as the Kolmogorov-Smirnov test) become hyper-sensitive, rejecting the null hypothesis under minor, practically negligible differences. Standardized effect sizes and Wasserstein distances are therefore reported alongside $p$-values to distinguish practical relevance from statistical detectability.
+
