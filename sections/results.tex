@@ -350,8 +350,57 @@ Across the various validation experiments and audits presented in this section, 
 
 \subsection{Comparative Baseline Extensions (Phase 22B)} \label{sec:comparative_baselines}
 
-To test whether the 16-feature space contains additional predictive information not captured by the RAI, we train two highly expressive, non-linear machine learning ensembles: a Random Forest (RF) classifier and a HistGradientBoosting (HGB) classifier. These baseline models are trained on the training partition and evaluated on the same Blind Validation Partition. Random Forest and HistGradientBoosting hyperparameters were tuned via 5-fold cross-validation using identical procedures for all models, with no access to the blind set. The results are reported in Table~\ref{tab:ml_baselines}.
-
 Both the Random Forest (AUROC = $0.6466$, ECE = $0.1223$) and the HistGradientBoosting classifier (AUROC = $0.6308$, ECE = $0.1687$) underperform the univariate RAI-only model (AUROC = $0.6732$, ECE = $0.0644$). This empirical result supports the hypothesis that the legacy feature set does not contain detectable predictive information once recovery ambiguity is controlled. Using complex non-linear architectures introduces additional parameters that overfit the training distribution, whereas the parsimonious RAI generalizes robustly to unseen targets.
 
 \input{tables/ml_baselines}
+
+\subsection{Catalog Cross-Matching and Vetting Results (EXP-002)} \label{sec:results_exp2_crossmatch}
+We report the results of the production cross-matching campaign executed over the $240,671$ accepted vetted targets from the production campaign against the NASA Exoplanet Archive, ExoFOP-TESS, and Villanova EB reference catalogs.
+
+\subsubsection{Classification Statistics and Count Reconciliation}
+The cross-match engine resolved a total of $58$ matches. A total of $62$ candidate matches were originally written, and $4$ matches representing competing or duplicate associations were eliminated during deterministic conflict resolution.
+
+The final classifications are partitioned as follows:
+\begin{itemize}
+    \item \textbf{KNOWN\_PLANET}: $4$ targets
+    \item \textbf{KNOWN\_TOI}: $1$ target
+    \item \textbf{KNOWN\_FP}: $53$ targets
+    \item \textbf{NOVEL\_CANDIDATE}: $240,613$ targets (defined as targets with no qualifying archival match under the spatial and temporal gates)
+    \item \textbf{AMBIGUOUS\_MATCH}: $0$ targets
+    \item \textbf{INSUFFICIENT\_DATA}: $0$ targets
+\end{itemize}
+
+The final classifications satisfy a bit-perfect mathematical reconciliation against the match failure reasons and spatial matching criteria. The total target count is decomposed as:
+\begin{equation}
+N_{\text{total}} = N_{\text{Matches}} + N_{\text{NO\_SPATIAL\_MATCH}} + N_{\text{PERIOD\_OUTSIDE\_TOLERANCE}}
+\end{equation}
+$$240,671 = 58 + 233,726 + 6,887$$
+
+A total of $6,945$ unique targets had at least one spatial match within $12.0\text{ arcseconds}$ in any of the three reference catalogs. The period mismatch failures are reconciled as:
+\begin{equation}
+N_{\text{PERIOD\_OUTSIDE\_TOLERANCE}} = N_{\text{spatial targets}} - N_{\text{resolved matches}}
+\end{equation}
+$$6,887 = 6,945 - 58$$
+
+The exoplanet recovery completeness is:
+\begin{equation}
+R_{\text{planets}} = \frac{N_{\text{recovered planets}}}{N_{\text{total planets in TARS sample}}} = \frac{4}{912} = 0.44\%
+\end{equation}
+where $912$ denotes the number of confirmed planets satisfying the spatial footprint.
+
+\subsubsection{Period Ratio Diagnostics and Alias Analysis}
+To investigate the low completeness value, we analyzed the distribution of the period ratio $R_P = P_{\text{recovered}} / P_{\text{archival}}$ for all $13,349$ valid spatial matching pairs (where each target-catalog association satisfying the spatial gate is counted as one pair, and percentages are computed over pairs). The diagnostics yield the following ratio distribution:
+\begin{itemize}
+    \item \textbf{Median Period Ratio}: $1.0885$
+    \item \textbf{Interquartile Range (IQR)}: $2.6700$
+    \item \textbf{Minimum Ratio}: $1.85 \times 10^{-8}$
+    \item \textbf{Maximum Ratio}: $35.25$
+\end{itemize}
+
+The period matches and aliases are categorized as follows:
+\begin{itemize}
+    \item \textbf{1:1 Matches}: $110$ pairs ($0.82\%$), corresponding to the $58$ unique resolved targets.
+    \item \textbf{Integer and Fractional Aliases}: $682$ pairs ($5.11\%$), including double period (2.0x, $122$ pairs, $0.91\%$), triple period (3.0x, $159$ pairs, $1.19\%$), quadruple period (4.0x, $87$ pairs, $0.65\%$), half period (0.5x, $64$ pairs, $0.48\%$), one-third period (0.33x, $45$ pairs, $0.34\%$), one-quarter period (0.25x, $52$ pairs, $0.39\%$), and 1.5x period ($43$ pairs, $0.32\%$).
+    \item \textbf{Long-Period Exoplanets ($> 27.4\text{ days}$)}: $2,896$ pairs ($21.69\%$) falling outside the single-sector TESS search window.
+    \item \textbf{Unaccounted/Complex Beating}: $9,771$ pairs ($73.20\%$).
+\end{itemize}

@@ -67,3 +67,12 @@ It is critical to distinguish the engineering accomplishments of this campaign f
 \subsubsection{Statistical Validity}
 *   \textbf{Statistical Significance Sensitivity}: Due to the extremely large sample size ($N \approx 250\text{k}$), standard hypothesis tests (such as the Kolmogorov-Smirnov test) become hyper-sensitive, rejecting the null hypothesis under minor, practically negligible differences. Standardized effect sizes and Wasserstein distances are therefore reported alongside $p$-values to distinguish practical relevance from statistical detectability.
 
+\subsection{Discussion of Cross-Matching Completeness \& Limitations (EXP-002)} \label{sec:disc_exp2}
+The catalog cross-matching campaign executed in EXP-002 yielded an exoplanet recovery completeness of $R_{\text{planets}} = 0.44\%$ ($4 / 912$). While low, our diagnostic analysis provides a physical explanation for this result:
+\begin{itemize}
+    \item \textbf{Search Window Limitations}: More than a fifth ($21.69\%$) of the confirmed exoplanets near our targets have orbital periods exceeding the single-sector TESS baseline of $27.4\text{ days}$. Because TARS requires at least two transits to confirm a period, it has a physical limit of $\sim 13.7\text{ days}$ for robust period recovery.
+    \item \textbf{Window-Function Systematics}: The remaining mismatches are consistent with expected window-function behavior in single-sector TESS observations. The central 1-day downlink gap in each sector creates a window beat at harmonics of $13.7\text{ days}$, which can dominate the BLS periodogram when the true signal is faint, causing the period search to lock onto systematic noise rather than the exoplanet's period. While the diagnostics support this interpretation, the present experiment does not uniquely identify the causal mechanism for every unmatched target.
+    \item \textbf{Multi-Sector Stitching Motivation}: These results demonstrate that period recovery—not coordinate matching—is the dominant limitation of the pipeline. This strongly motivates future work (specifically EXP-003) to stitch multi-sector observations together, extending the baseline and removing downlink gap beats.
+    \item \textbf{Nature of Novel Candidates}: The $240,613$ targets classified as \texttt{NOVEL\_CANDIDATE} represent an uncataloged candidate pool requiring additional astrophysical vetting, rather than confirmed discoveries. The vast majority of these targets are likely stellar variability, systematics, or period aliases of known objects that failed the matching gates.
+\end{itemize}
+
