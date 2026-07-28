@@ -287,7 +287,7 @@ A CMI value close to zero indicates that legacy features are statistically redun
 \subsection{Reproducibility} \label{sec:method_reproducibility}
 \begin{itemize}
 \item \textbf{Dataset Selection}: The Operational Corpus is partitioned into distinct development splits and an independent Blind Validation Partition (see Section~\ref{sec:method_dataset_overview}). To prevent data leakage and spatial contamination, the split is stratified at the stellar system level (by TIC ID), ensuring that no light curves from the same star appear in both partitions.
-\item \textbf{Software Implementation}: The pipeline is implemented in Python (using standard libraries: \texttt{numpy}, \texttt{scipy}, \texttt{scikit-learn}, \texttt{pandas}, \texttt{pytest}). All source code, configuration files, and validation scripts are publicly available on GitHub at \url{https://github.com/rk-roshan-kr/Tars-Transit-Ambiguity-Recovery-System}. All random seeds are locked to \texttt{42} to ensure exact reproduction of the bootstrap resamples and permutation tests.
+\item \textbf{Software Implementation}: The pipeline is implemented in Python (using scientific packages: \texttt{numpy}, \texttt{scipy}, \texttt{scikit-learn}, \texttt{pandas}, \texttt{lightkurve}, \texttt{astroquery}, \texttt{emcee}). All source code, configuration files, and validation scripts are publicly available on GitHub at \url{https://github.com/rk-roshan-kr/Tars-Transit-Ambiguity-Recovery-System}. All random seeds are locked to \texttt{42} to ensure exact reproduction of the bootstrap resamples and permutation tests.
 \item \textbf{Execution Order}:
     \begin{enumerate}
     \item Preprocess raw light curves and detrend (Stage 1).
