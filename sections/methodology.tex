@@ -332,3 +332,53 @@ To vet the candidates scoring above the pipeline detection threshold against his
     \item \textbf{Database Integrity \& Schema Versioning}: Results are written to three isolated databases: \texttt{candidate\_matches.db}, \texttt{resolved\_matches.db}, and \texttt{classification.db} using transactional batch operations under WAL mode, subject to SQL \texttt{CHECK} constraints.
     \item \textbf{Reproducibility}: The code, configurations, database outputs, and validation tests are frozen under Git tag \texttt{EXP-002-Reference} (commit \texttt{7e768af}).
 \end{itemize}
+
+\subsection{Stage 8: Multi-Sector Transit Recovery and Vetting (EXP-003)} \label{sec:method_exp3_multisector}
+To evaluate whether longer orbital baselines resolve period aliasing and improve target-level completeness, we implemented a multi-sector re-evaluation campaign (EXP-003) targeting cohorts of TARS candidate hosts:
+\begin{itemize}
+    \item \textbf{Cohort Definitions}:
+        \begin{itemize}
+            \item \textbf{Cohort A}: The entire pool of $240,613$ targets classified as \texttt{NOVEL\_CANDIDATE} in the baseline cross-matching campaign.
+            \item \textbf{Cohort B}: The subset of Cohort A targets located within $12.0\text{ arcseconds}$ of a confirmed planet in the NASA Exoplanet Archive ($ps$) catalog (consisting of $1,301$ unique targets that failed single-sector period recovery).
+        \end{itemize}
+    \item \textbf{Multi-Sector Ingestion}: The downloader queries the MAST portal for TESS SPOC 2-minute cadence time-series products and fetches all available observation sectors.
+    \item \textbf{Deterministic Stitching}: Light curve sectors are processed using:
+        \begin{equation}
+        f_{i, \text{norm}} = \frac{f_i}{\text{median}(f_{\text{sector}})}
+        \end{equation}
+        We filter out bad quality flags ($\text{QUALITY} \neq 0$). Overlapping cadences are resolved by selecting the data point with the lower normalized flux uncertainty. Sector-to-sector chronological gaps are preserved as NaN segments.
+    \item \textbf{Signal Detrending \& BLS Search}: Stitched light curves are conditioned using a sliding median filter with a $1.0\text{-day}$ window. We execute an astropy \texttt{BoxLeastSquares} search over the period range $[0.5, 20.0]\text{ days}$ with a frequency grid size of $\Delta f = 10^{-4}\text{ day}^{-1}$, an oversampling factor of $4$, and transit durations ranging from $0.01$ to $0.25\text{ days}$.
+    \item \textbf{Vetting Resolution}: A target is classified as successfully recovered under multi-sector search if the best BLS period matches the catalog exoplanet period within absolute ($0.001\text{ days}$) or fractional ($0.1\%$) tolerances.
+\end{itemize}
+
+\subsection{Stage 9: Injection--Recovery Sensitivity Analysis (EXP-004)} \label{sec:method_exp4_sensitivity}
+To characterize the sensitivity and recovery completeness limits of the frozen TARS pipeline, we implemented a controlled injection-recovery campaign (EXP-004):
+\begin{itemize}
+    \item \textbf{Analytical Transit Injection}: We inject synthetic exoplanet transits into real TESS time series. Transits are modeled using a deterministic hard trapezoid:
+        \begin{itemize}
+            \item \textit{Log-Uniform Periods}: $\ln P_{\text{inj}} \sim \text{Uniform}(\ln 0.5, \ln 20.0)$ days.
+            \textit{Log-Uniform Depths}: $\ln p \sim \text{Uniform}(\ln 0.01, \ln 0.10)$, where injected depth is $D = p^2$.
+            \item \textit{Uniform Impact Parameters}: $b \sim \text{Uniform}(0.0, 0.8)$.
+            \item \textit{Semi-Major Axis Keplerian Scaling}: $\frac{a}{R_*} = 4.27 \left(\frac{P}{1\text{ day}}\right)^{2/3}$.
+        \end{itemize}
+    \item \textbf{Grid Alignment Justification}: The hard trapezoid model was intentionally selected to match the detection assumptions of the Box Least Squares (BLS) algorithm rather than to reproduce detailed stellar limb-darkening physics.
+    \item \textbf{High-Throughput Campaign execution}: We select a random sample of $100$ unique TIC targets from the TESS base dataset. Each target receives $20$ independent injections, yielding a total campaign of $2,000$ simulation runs.
+    \item \textbf{Database Schema \& Replicability}: Results are written to a localized database \texttt{archive/EXP-004/injection.db} containing complete parameter listings, z-score metrics, and deterministic RNG seeds to enable exact replication.
+\end{itemize}
+
+\subsection{Stage 10: Comparative Baseline Benchmark (EXP-005)} \label{sec:method_exp5_benchmark}
+To validate the performance of the TARS pipeline against standard exoplanet search algorithms, we conducted a comparative baseline benchmark (EXP-005):
+\begin{itemize}
+    \item \textbf{Baseline Algorithms}: We select Vanilla Box Least Squares (BLS) and Transit Least Squares (TLS) as baseline methods.
+    \item \textbf{Input Symmetry}: To ensure a fair comparison, all three algorithms receive identical detrended light curves (conditioned using a sliding median filter with a $1.0\text{-day}$ window and a $0.25\text{-day}$ noise filter).
+    \item \textbf{Parameter Setup}:
+        \begin{itemize}
+            \item \textit{Vanilla BLS}: Run using astropy \texttt{BoxLeastSquares} over the period range $[0.5, 20.0]\text{ days}$ with an oversampling factor of $4$ and $25$ transit duration bins.
+            \item \textit{Transit Least Squares}: Run using the \texttt{transitleastsquares} package over the period range $[0.5, 20.0]\text{ days}$ utilizing stellar limb-darkening templates matched to host star radius ($R_*$), mass ($M_*$), and effective temperature ($T_{\text{eff}}$).
+            \item \textit{TARS}: Scanned using Stage 2 transit event detection (local significance threshold $S_i \ge 3.0$) and Stage 3 sparse period recovery.
+        \end{itemize}
+    \item \textbf{Stratified Sampling}: We sample $10$ host stars from the $100$ stars of the EXP-004 dataset using stratified random sampling to preserve the proportion of active vs. quiet stellar classes. For each selected star, we run all $20$ injection trials (yielding $200$ runs in total).
+    \item \textbf{False Positive Evaluation}: We run the three search algorithms on the $10$ raw (non-injected) light curves to evaluate the empirical false positive rate under identical conditions.
+    \item \textbf{Statistical Diagnostics}: We evaluate primary F1-score, ROC-AUC, recovery rates, and Brier calibration scores. We compute $95\%$ bootstrap confidence intervals ($1,000$ resamples) for performance deltas, McNemar's exact test for recovery rates, and Wilcoxon signed-rank tests with Cliff's Delta for computational runtimes.
+\end{itemize}
+

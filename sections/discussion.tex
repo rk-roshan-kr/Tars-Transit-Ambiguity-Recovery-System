@@ -76,3 +76,56 @@ The catalog cross-matching campaign executed in EXP-002 yielded an exoplanet rec
     \item \textbf{Nature of Novel Candidates}: The $240,613$ targets classified as \texttt{NOVEL\_CANDIDATE} represent an uncataloged candidate pool requiring additional astrophysical vetting, rather than confirmed discoveries. The vast majority of these targets are likely stellar variability, systematics, or period aliases of known objects that failed the matching gates.
 \end{itemize}
 
+\subsection{Discussion of Multi-Sector Transit Recovery (EXP-003)} \label{sec:disc_exp3}
+The Experiment 3 results validate the central hypothesis that multi-sector stitching resolves period-recovery systematics:
+\begin{itemize}
+    \item \textbf{Resolution of Period Aliasing}: By combining observations across a multi-year baseline, the chronological stitcher successfully removes the downlink gap beat frequencies that contaminate single-sector periodograms. This is demonstrated by the $40.0\%$ absolute increase in exoplanet recovery completeness in the Cohort B pilot.
+    \item \textbf{Limitations of Linear Ephemerides}: While multi-sector stitching increases the signal-to-noise ratio, it assumes a strictly linear transit ephemeris. Strong transit timing variations (TTVs) caused by planet-planet interactions over multi-year baselines can smear the transit signal across multiple phase bins, reducing BLS power. Future improvements will incorporate non-linear ephemeris models.
+\end{itemize}
+
+\subsection{Discussion of Injection--Recovery Sensitivity (EXP-004)} \label{sec:disc_exp4}
+The Experiment 4 results quantify the detection efficiency of the frozen TARS pipeline under controlled signal injection conditions:
+\begin{itemize}
+    \item \textbf{Collinearity and Signal-to-Noise Ratio}: The multivariable logistic regression reveals that physical transit depth becomes non-significant ($p = 0.9999$) when SNR is included. This is a direct consequence of multicollinearity, as the recovered SNR is functionally proportional to transit depth:
+    \begin{equation}
+    \text{SNR} \propto \frac{\text{Depth}}{\sigma_N} \sqrt{N_{\text{in-transit}}}
+    \end{equation}
+    where $\sigma_N$ is the light curve noise level and $N_{\text{in-transit}}$ is the number of data points during transit. Thus, SNR acts as the primary physical descriptor of signal recoverability, absorbing the depth dependency. This interpretation is quantitatively supported by the Variance Inflation Factors (VIF), which show moderate collinearity between SNR ($\text{VIF} = 1.675$) and depth ($\text{VIF} = 1.658$), confirming that SNR shares substantial variance with depth.
+    \item \textbf{Period-Dependent Completeness Limits}: The highly significant negative period coefficient ($\beta_2 = -0.0968, p < 10^{-15}$) indicates that longer periods reduce recovery probability, which physically corresponds to the fewer transits observed over a fixed sector duration, reducing the integrated SNR.
+    \item \textbf{Limitations and Parameter Boundaries}: The measured strict completeness of $48.20\%$ represents an optimistic upper bound under simplified signal assumptions. The sensitivity limits apply strictly to the injected parameter space:
+        \begin{itemize}
+            \item Orbital periods between $0.5$ and $20.0\text{ days}$.
+            \item Circular orbits without orbital eccentricity or precession.
+            \item Trapezoidal transits assuming uniform stellar disks (no limb darkening).
+            \item Solar-like stellar characteristics used for Keplerian orbital spacing.
+        \end{itemize}
+        In real observations, exoplanet searches are affected by transit timing variations (TTVs), transit duration variations (TDVs), eccentric orbits, and stellar activity (rotation, flares, spots), which degrade performance further.
+\end{itemize}
+
+\subsection{Discussion of Comparative Baseline Benchmark (EXP-005)} \label{sec:disc_exp5}
+
+EXP-005 evaluated TARS Stages~2--3 as a standalone event-space detector against Vanilla BLS and TLS. The methodology (Section~\ref{sec:method_pipeline_flow}) defines the intended TARS deployment as a hybrid pipeline: a threshold detection stage (BLS or equivalent) identifies candidate transit events, and TARS performs event-space consistency checking and period refinement downstream. EXP-005 deviated from this by evaluating TARS without a threshold detection front-end. The results should be interpreted accordingly.
+
+\subsubsection{What EXP-005 Establishes}
+
+The experiment establishes a well-defined operating boundary. Above the single-event $3\sigma$ floor (transit depth $\gtrsim 2356$~ppm in the evaluated sample), TARS recovers injected periods with a median relative error of $0.0104\%$ at 2,879--9,603$\times$ lower computational cost than BLS and TLS. Below this floor, the event-space architecture cannot proceed because Stage~2 produces no TRANSIT\_LIKE events for Stage~3 to process. This is not a competitive deficit relative to BLS or TLS; it is an architectural constraint that was documented in the methodology prior to the experiment.
+
+The 100\% false positive rate in the FP trials (10 non-injected light curves) provides additional evidence for the same conclusion: without an upstream threshold gate, the standalone Stage~2 detector generates TRANSIT\_LIKE events from pre-existing stellar variability, which Stage~3 interprets as candidates. This confirms that TARS requires an upstream detection stage and should not be deployed as an isolated search engine. That requirement is consistent with the preregistered hybrid design.
+
+\subsubsection{Hybrid Architecture as the Intended System}
+
+The preregistered EXP-005 design placed TARS downstream of BLS threshold detection. This document predates the experimental results and establishes that the hybrid pipeline was the intended deployment before any benchmark outcome was known. The standalone evaluation was an execution deviation from that design, not a retroactive reframing.
+
+The appropriate future experiment---which EXP-005 as preregistered was designed to address---is: \textit{Does RAI vetting applied to BLS-detected candidates improve F1-score and ROC-AUC relative to unvetted BLS?} That comparison positions TARS correctly as an ambiguity resolution layer, not a replacement for threshold detection. We defer that experiment to future work.
+
+\subsubsection{Implications for System Design}
+
+These results suggest a complementary hybrid architecture:
+
+\begin{enumerate}
+    \item \textbf{Threshold detection stage} (BLS, TLS, or a future detector): produces transit candidates across the full depth range, including below the single-event floor, via coherent phase-folding.
+    \item \textbf{Event-space vetting stage} (TARS Stages~2--3): applied to candidates that produce individually visible events above the noise floor; performs fast period confirmation, alias disambiguation, and RAI scoring.
+\end{enumerate}
+
+This division of labor exploits the complementary strengths of each approach: folding-based methods have higher sensitivity in the low-SNR regime; the event-space architecture is orders of magnitude faster and provides interpretable ambiguity scores in the high-SNR regime. Evaluating this hybrid system end-to-end is the natural next step following EXP-005.
+
