@@ -4,15 +4,14 @@
 \label{tab:pipeline_throughput}
 \begin{tabular}{lcc}
 \hline\hline
-Pipeline Stage / Outcome & Surviving Targets Count & Survival Rate \\
+Pipeline Stage & Surviving Targets Count & Survival Rate \\
 \hline
-Submitted target-sector observations & 250,010 & 100.0\% \\
-Excluded: Missing FITS inputs (\texttt{ERR\_MISSING\_INPUT}) & 4,379 & 1.75\% \\
-Excluded: Corrupt files (\texttt{ERR\_PIPELINE\_CRASH}) & 5 & <0.01\% \\
-Total successfully processed observations & 245,626 & 98.25\% \\
-Rejected: No transit detected (\texttt{ERR\_NO\_TRANSIT}) & 4,685 & 1.87\% \\
-Rejected: Unstable period recovery (\texttt{ERR\_NAN\_PERIOD}) & 283 & 0.11\% \\
-Accepted catalog records (\texttt{Vetting\_Prob} $\ge 0.50$) & 240,671 & 96.26\% \\
+Input targets (Operational Corpus) & 250,010 & 100.0% \\
+Stage 1 Survived (Conditioned) & 250,010 & 100.00% \\
+Stage 2 Survived (Detected Stars) & 129,383 & 51.75% \\
+Stage 3 Candidate Families & 247,937 & 99.17% \\
+Ranked Candidates (Ambiguity Filtered) & 775 & 0.3100% \\
+High-Confidence Candidates (p >= 0.5) & 100 & 0.0400% \\
 \hline
 \end{tabular}
 \end{table}
