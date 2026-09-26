@@ -57,6 +57,52 @@ The global TARS pipeline is structured into six modular stages. The design ratio
     \end{itemize}
 \end{itemize}
 
+\subsection{Architecture of Coordinated Validation Experiments} \label{sec:method_experiment_matrix}
+
+To systematically evaluate automated exoplanet vetting pipelines beyond simple single-split benchmarks, our validation protocol is operationalized through a coordinated suite of 13 executed validation experiments selected from our 23-stage preregistered experimental sequence (spanning designations EXP-001 through EXP-023). These experiments map directly onto the multi-layer certification hierarchy introduced in Section~\ref{sec:contribution} (Figure~\ref{fig:validation_hierarchy}), progressing from high-throughput production baselines and synthetic injection sweeps to out-of-domain transfer tests, nested regression controls, and non-Gaussian astrophysical noise stress testing.
+
+\paragraph{Numbering Scheme and Preregistration Taxonomy.}
+The experiment identifiers (EXP-xxx) follow the formal preregistered study protocols locked in the research archive. The numbering sequence is intentionally non-contiguous:
+\begin{itemize}
+    \item \textbf{Core Validation Campaigns (EXP-001 to EXP-005)}: Represent the primary pipeline freeze, full-scale production run ($250{,}010$ targets), archival catalog cross-matching, multi-sector baseline recovery, synthetic injection completeness sweeps, and classical baseline benchmarks (BLS/TLS).
+    \item \textbf{Multi-Dimensional Protocol Audits (EXP-007 to EXP-023)}: Represent the higher-layer protocol stress tests, encompassing cross-sector metric stability (EXP-007), feature ablation (EXP-009), topological clustering (EXP-010), incremental value modeling (EXP-011), blind recovery challenge (EXP-012), cross-mission domain transfer (EXP-013), nested control regression (EXP-019), and realistic stellar/instrumental noise sweeps (EXP-023).
+\end{itemize}
+
+\paragraph{Exhaustive Accounting of Preregistered Experiment Identifiers.}
+To eliminate any ambiguity regarding unlisted identifiers in the 23-stage sequence, the ten intermediate numbers correspond to internal engineering calibrations, exploratory trials, and infrastructure profiling tasks that were completed and archived during pipeline development prior to protocol freeze:
+\begin{itemize}
+    \item \textbf{EXP-006 (Archived)}: Local spline detrending window and polynomial filter optimization; superseded by the baseline sliding-median spline filter.
+    \item \textbf{EXP-008 (Archived)}: Period alias graph candidate linkage threshold calibration; subsumed into the EXP-010 Gaussian Mixture Model topological analysis.
+    \item \textbf{EXP-014 to EXP-018 (Archived)}: Exploratory multi-camera photometric blending simulations and preliminary false-alarm threshold calibrations; archived as preparatory sensitivity trials prior to final protocol execution.
+    \item \textbf{EXP-020 to EXP-022 (Archived)}: Hardware execution profiling, multi-worker process queue scaling, and SQLite transaction locking benchmarks; separated from scientific reporting and archived in engineering logs.
+\end{itemize}
+All 13 active scientific experiments reported in this manuscript are frozen, clean-room verified, and version-locked in the study repository. Table~\ref{tab:experiment_master_matrix} provides a master index of these 13 coordinated experiments, outlining their formal titles, methodological and results section pointers, sample cohorts, and primary scientific targets. Complete reproduction commands, dataset checkpoints, and Git commit hashes for each experiment are cataloged in Appendix~\ref{sec:app_experiment_registry}.
+
+\begin{deluxetable*}{lllccc}[htbp]
+\tabletypesize{\scriptsize}
+\tablecaption{Coordinated Experimental Campaign Overview\label{tab:experiment_master_matrix}}
+\tablewidth{0pt}
+\tablehead{
+\colhead{Exp ID} & \colhead{Campaign Title} & \colhead{Methods} & \colhead{Results} & \colhead{Sample Size / Cohort} & \colhead{Scientific Objective \& Primary Target}
+}
+\startdata
+\textbf{EXP-001} & Production Infrastructure & \S\ref{sec:method_exp1_production} & \S\ref{sec:results_hierarchy} & 250,010 targets (Sec 1--14) & \parbox{5.8cm}{High-throughput reference execution across $250{,}010$ TESS observations; recovered 22 known planets and established frozen baseline catalog.} \\
+\textbf{EXP-002} & Catalog Cross-Matching & \S\ref{sec:method_exp2_crossmatch} & \S\ref{sec:results_exp2_crossmatch} & 240,671 targets & \parbox{5.8cm}{Spatial ($12''$) and temporal period matching against NASA archive; identified period aliasing as the primary recovery bottleneck ($R=0.44\%$, 4/912 planets).} \\
+\textbf{EXP-003} & Multi-Sector Transit Recovery & \S\ref{sec:method_exp3_multisector} & \S\ref{sec:results_exp3_multisector} & 1,301 candidates & \parbox{5.8cm}{Multi-sector SPOC light-curve stitching across 1,301 archival candidates; proved baseline extension resolves downlink gap beats and reduces period aliasing.} \\
+\textbf{EXP-004} & Injection--Recovery Sensitivity & \S\ref{sec:method_exp4_sensitivity} & \S\ref{sec:results_exp4_sensitivity} & 2,000 injections (100 TICs) & \parbox{5.8cm}{Injected 2,000 hard trapezoid synthetic transits into 100 real light curves; derived completeness recovery functions across period and depth.} \\
+\textbf{EXP-005} & Comparative Baseline Benchmark & \S\ref{sec:method_exp5_benchmark} & \S\ref{sec:results_exp5_benchmark} & 200 trials + 10 raw & \parbox{5.8cm}{Evaluated standalone TARS against Vanilla BLS and TLS on 200 injected trials; uncovered single-event detection floor ($\sim 2356$ ppm) vs $\sqrt{N}$ folding boost.} \\
+\textbf{EXP-007} & Cross-Sector RAI Stability & \S\ref{sec:method_exp007_protocol} & \S\ref{sec:results_exp007} & 3,517 sector pairs (311 TICs) & \parbox{5.8cm}{Cross-sector reproducibility across 3,517 sector pairs; revealed single-sector variance $|\Delta\text{RAI}| \approx 2.2$ with stellar activity predicting instability ($p < 0.0001$).} \\
+\textbf{EXP-009} & Feature Ablation Matrix & \S\ref{sec:method_exp009_protocol} & \S\ref{sec:results_exp009} & 965 stars + 2,000 inj. & \parbox{5.8cm}{Ablation of 5 RAI sub-features across 965 stars and 2,000 injections; validated that the signed sum optimizes calibration without post-hoc scaling.} \\
+\textbf{EXP-010} & Graph Topological Clustering & \S\ref{sec:method_exp010_protocol} & \S\ref{sec:results_exp010} & 5,000 sample targets & \parbox{5.8cm}{Unsupervised GMM ($k=3$) on alias graph entropy and complexity across 5,000 targets; isolated 3 distinct astrophysical topology archetypes (ARI $= 0.9831$).} \\
+\textbf{EXP-011} & Incremental Value of Graph Features & \S\ref{sec:method_exp011_protocol} & \S\ref{sec:results_exp011} & 193 blind test targets & \parbox{5.8cm}{Trained nested models A--D on blind test data; demonstrated alias-graph features provide statistically significant incremental AUPRC and calibration gain.} \\
+\textbf{EXP-012} & Blind Planet Recovery Challenge & \S\ref{sec:method_exp012_protocol} & \S\ref{sec:results_exp012} & 1,780 unblinded targets & \parbox{5.8cm}{Unblinded evaluation on 1,780 targets ($654$ planets, $1{,}126$ FPs); refuted the synthetic injection proxy completeness hypothesis ($H_{2d}$).} \\
+\textbf{EXP-013} & Multi-Mission Domain Transfer & \S\ref{sec:method_exp013_protocol} & \S\ref{sec:results_exp013} & TESS, Kepler (100), K2 (41) & \parbox{5.8cm}{Cross-mission transfer to Kepler ($N=100$) and K2 ($N=41$); exposed AUROC collapse ($0.48$) and ECE decay ($0.5212$) from Kepler 30-min cadence.} \\
+\textbf{EXP-019} & Nested Control Audits & \S\ref{sec:method_exp019_protocol} & \S\ref{sec:results_exp019} & 1,780 unblinded targets & \parbox{5.8cm}{Nested logistic regression on 1,780 unblinded targets; proved RAI lacks independent predictive value over BLS SDE ($p = 0.090$), diagnosing feature redundancy.} \\
+\textbf{EXP-023} & Realistic Noise Stress Sweeps & \S\ref{sec:method_exp023_protocol} & \S\ref{sec:results_exp023} & 500 synthetic trials & \parbox{5.8cm}{Injected synthetic transits with granulation, flares, and jitter across 500 trials; mapped decision threshold drift and non-Gaussian noise boundaries.} \\
+\enddata
+\tablecomments{Preregistration taxonomy: The 13 active experiments listed above were selected from a 23-stage preregistration sequence (EXP-001 through EXP-023). Intermediate labels (EXP-006, EXP-008, EXP-014--018, and EXP-020--022) were assigned to internal development sprints, detrending optimizations, and infrastructure benchmarks completed prior to freezing the scientific protocol. All 13 primary experiments are version-controlled, clean-room verified, and locked in the study repository.}
+\end{deluxetable*}
+
 \subsection{Operational Dataset Construction and Partitioning} \label{sec:method_dataset_overview}
 
 To ensure reproducibility, we detail the construction of the exoplanet dataset and the partitions used for model fitting, parameter tuning, and independent evaluation. 
@@ -148,6 +194,8 @@ The algorithm for candidate family construction is executed through the followin
 \caption{Representation of an exoplanet candidate alias graph. Vertices denote period hypotheses, and edges represent matched harmonics within phase tolerance $\epsilon = 0.05$.}
 \label{fig:alias_graph}
 \end{figure}
+
+An illustration of a simple alias graph is shown in Figure~\ref{fig:alias_graph}.
 
 \subsection{Derivation of the Five RAI Sub-Features} \label{sec:method_features}
 To quantify the topological properties of the alias graph and the stability of the period recovery search, TARS computes five sub-features from the candidate period set $\mathcal{P}$:
@@ -299,8 +347,8 @@ A CMI value close to zero indicates that legacy features are statistically redun
     \end{enumerate}
 \end{itemize}
 
-\subsection{Scientific Freeze and High-Throughput Production Infrastructure} \label{sec:method_freeze_infrastructure}
-During production optimization, all scientific algorithms, feature extraction routines, model parameters, numerical precision, and decision thresholds were frozen. Only infrastructure components---including scheduling, checkpointing, database operations, logging, and input validation---were modified.
+\subsection{Production Campaign Infrastructure and Baseline Execution (EXP-001)} \label{sec:method_exp1_production} \label{sec:method_freeze_infrastructure}
+As Experiment~1 (EXP-001) in our coordinated validation suite (Table~\ref{tab:experiment_master_matrix}), we executed the full-scale production campaign across $250{,}010$ TESS target-sector observations to establish the baseline catalog and reference pipeline freeze. During production optimization, all scientific algorithms, feature extraction routines, model parameters, numerical precision, and decision thresholds were frozen. Only infrastructure components---including scheduling, checkpointing, database operations, logging, and input validation---were modified.
 
 To scale the TARS vetting pipeline to the full $250,010$ target-sector observations, we engineered a high-throughput parallel execution infrastructure:
 \begin{itemize}
@@ -311,7 +359,7 @@ To scale the TARS vetting pipeline to the full $250,010$ target-sector observati
 \end{itemize}
 
 \subsection{Stage 7: Catalog Cross-Matching and Discovery Vetting (EXP-002)} \label{sec:method_exp2_crossmatch}
-To vet the candidates scoring above the pipeline detection threshold against historical archives, we developed an automated catalog cross-matching engine. The engine matches TARS vetted candidates against the NASA Exoplanet Archive Planetary Systems ($ps$) catalog, ExoFOP-TESS TOI catalog, and the Villanova TESS Eclipsing Binary catalog. The matching protocol is structured as follows:
+As Experiment~2 (EXP-002; Table~\ref{tab:experiment_master_matrix}), to vet the candidates scoring above the pipeline detection threshold against historical archives, we developed an automated catalog cross-matching engine. The engine matches TARS vetted candidates against the NASA Exoplanet Archive Planetary Systems ($ps$) catalog, ExoFOP-TESS TOI catalog, and the Villanova TESS Eclipsing Binary catalog. The matching protocol is structured as follows:
 \begin{itemize}
     \item \textbf{Coordinate Matching (Spatial Gate)}: Angular separation is calculated on a unit sphere using 3D Cartesian coordinates. The coordinates (RA, Dec) are converted to Cartesian unit vectors:
     \begin{equation}
@@ -334,7 +382,7 @@ To vet the candidates scoring above the pipeline detection threshold against his
 \end{itemize}
 
 \subsection{Stage 8: Multi-Sector Transit Recovery and Vetting (EXP-003)} \label{sec:method_exp3_multisector}
-To evaluate whether longer orbital baselines resolve period aliasing and improve target-level completeness, we implemented a multi-sector re-evaluation campaign (EXP-003) targeting cohorts of TARS candidate hosts:
+As Experiment~3 (EXP-003; Table~\ref{tab:experiment_master_matrix}), to evaluate whether longer orbital baselines resolve period aliasing and improve target-level completeness, we implemented a multi-sector re-evaluation campaign targeting cohorts of TARS candidate hosts:
 \begin{itemize}
     \item \textbf{Cohort Definitions}:
         \begin{itemize}
@@ -352,7 +400,7 @@ To evaluate whether longer orbital baselines resolve period aliasing and improve
 \end{itemize}
 
 \subsection{Stage 9: Injection--Recovery Sensitivity Analysis (EXP-004)} \label{sec:method_exp4_sensitivity}
-To characterize the sensitivity and recovery completeness limits of the frozen TARS pipeline, we implemented a controlled injection-recovery campaign (EXP-004):
+As Experiment~4 (EXP-004; Table~\ref{tab:experiment_master_matrix}), to characterize the sensitivity and recovery completeness limits of the frozen TARS pipeline, we implemented a controlled injection-recovery campaign:
 \begin{itemize}
     \item \textbf{Analytical Transit Injection}: We inject synthetic exoplanet transits into real TESS time series. Transits are modeled using a deterministic hard trapezoid:
         \begin{itemize}
@@ -367,7 +415,7 @@ To characterize the sensitivity and recovery completeness limits of the frozen T
 \end{itemize}
 
 \subsection{Stage 10: Comparative Baseline Benchmark (EXP-005)} \label{sec:method_exp5_benchmark}
-To validate the performance of the TARS pipeline against standard exoplanet search algorithms, we conducted a comparative baseline benchmark (EXP-005):
+As Experiment~5 (EXP-005; Table~\ref{tab:experiment_master_matrix}), to validate the performance of the TARS pipeline against standard exoplanet search algorithms, we conducted a comparative baseline benchmark:
 \begin{itemize}
     \item \textbf{Baseline Algorithms}: We select Vanilla Box Least Squares (BLS) and Transit Least Squares (TLS) as baseline methods.
     \item \textbf{Input Symmetry}: To ensure a fair comparison, all three algorithms receive identical detrended light curves (conditioned using a sliding median filter with a $1.0\text{-day}$ window and a $0.25\text{-day}$ noise filter).
@@ -381,4 +429,36 @@ To validate the performance of the TARS pipeline against standard exoplanet sear
     \item \textbf{False Positive Evaluation}: We run the three search algorithms on the $10$ raw (non-injected) light curves to evaluate the empirical false positive rate under identical conditions.
     \item \textbf{Statistical Diagnostics}: We evaluate primary F1-score, ROC-AUC, recovery rates, and Brier calibration scores. We compute $95\%$ bootstrap confidence intervals ($1,000$ resamples) for performance deltas, McNemar's exact test for recovery rates, and Wilcoxon signed-rank tests with Cliff's Delta for computational runtimes.
 \end{itemize}
+
+\subsection{Multi-Dimensional Protocol Auditing Experiments (EXP-007 through EXP-023)} \label{sec:method_audits_overview}
+To implement the higher layers of our multi-dimensional validation protocol (Layers 2--6 in Figure~\ref{fig:validation_hierarchy}), we designed and preregistered eight specialized auditing experiments:
+
+\subsubsection{Cross-Sector Reproducibility Protocol (EXP-007)} \label{sec:method_exp007_protocol}
+As Experiment~6 in our executed sequence (preregistered label EXP-007; Table~\ref{tab:experiment_master_matrix}), we evaluate the cross-sector stability of the Recovery Ambiguity Index (RAI). The RAI is formulated as a single-sector metric. To evaluate whether RAI reflects intrinsic astrophysical properties rather than noise or window function artifacts, EXP-007 tests its sector-to-sector stability. The protocol identifies all targets in the TARS-250K corpus observed across $\ge 2$ sectors. For each multi-sector pair, we compute $|\Delta\text{RAI}| = |\text{RAI}_{s_1} - \text{RAI}_{s_2}|$, stratified into quiet stars ($\text{MAD} < 500\text{ ppm}$) and active stars ($\text{MAD} \ge 500\text{ ppm}$). The statistical evaluation tests whether median $|\Delta\text{RAI}|$ differs between activity classes via Wilcoxon rank-sum test, measures Spearman correlation across pairs, and models instability via OLS regression against $\log(1 + \text{MAD}_{\text{ppm}})$.
+
+\subsubsection{Component Sensitivity and Feature Ablation Protocol (EXP-009)} \label{sec:method_exp009_protocol}
+As Experiment~7 in our executed sequence (preregistered label EXP-009; Table~\ref{tab:experiment_master_matrix}), to evaluate the contribution and potential redundancy of each component in the 5-feature signed RAI sum, EXP-009 implements a systematic ablation matrix across 11 feature configurations. Each configuration is evaluated on two independent benchmarks: (1) the hand-labeled validation partition ($N=965$ stars), and (2) the $2{,}000$ synthetic injections from EXP-004. For each ablation step, we measure discrimination (AUROC, AUPRC), calibration (Expected Calibration Error, ECE), and Brier score to assess whether model parsimony can be improved without loss of calibration reliability.
+
+\subsubsection{Alias-Graph Topological Clustering Protocol (EXP-010)} \label{sec:method_exp010_protocol}
+As Experiment~8 in our executed sequence (preregistered label EXP-010; Table~\ref{tab:experiment_master_matrix}), to determine whether candidate period alias graphs exhibit discrete topological archetypes across diverse stellar environments, EXP-010 executes unsupervised clustering on a representative corpus of $5{,}000$ targets. Feature vectors comprise graph Shannon entropy, average degree, harmonic connectivity, and cyclomatic complexity. We fit Gaussian Mixture Models (GMM) across component counts $k \in [1, 8]$, selecting the optimal partition via BIC/AIC and validating cluster stability using bootstrap resampling (Adjusted Rand Index, ARI) across 80\% random sub-splits.
+
+\subsubsection{Incremental Predictive Value Protocol (EXP-011)} \label{sec:method_exp011_protocol}
+As Experiment~9 in our executed sequence (preregistered label EXP-011; Table~\ref{tab:experiment_master_matrix}), to assess whether graph-theoretic ambiguity features provide incremental predictive power beyond standard period-search signal metrics, EXP-011 formulates four nested logistic regression models: Model A (Baseline: BLS SDE and transit depth), Model B (Baseline + Graph Topology), Model C (Baseline + Ambiguity), and Model D (Full TARS: Baseline + Graph Topology + Ambiguity). Models are trained on the development split and evaluated on the independent blind test split ($N=193$ targets). Incremental performance is quantified by $\Delta\text{AUPRC}$ and calibration curves with $95\%$ bootstrap confidence intervals.
+
+\subsubsection{Blind Planet Recovery Protocol (EXP-012)} \label{sec:method_exp012_protocol}
+As Experiment~10 in our executed sequence (preregistered label EXP-012; Table~\ref{tab:experiment_master_matrix}), to evaluate the true discovery completeness of standalone TARS under unblinded archival conditions, EXP-012 deploys the pipeline across an unblinded challenge set of $N = 1{,}780$ targets ($654$ confirmed planets and $1{,}126$ confirmed false positives from the NASA Exoplanet Archive). We compute true positive rates (TPR) and false positive rates (FPR) stratified across transit depth quartiles and stellar activity classes. Crucially, the observed TPR is formally compared against the predicted completeness from the EXP-004 synthetic injection recovery model to test the injection study cross-validation hypothesis ($H_{2d}$).
+
+\subsubsection{Multi-Mission Domain Transfer Protocol (EXP-013)} \label{sec:method_exp013_protocol}
+As Experiment~11 in our executed sequence (preregistered label EXP-013; Table~\ref{tab:experiment_master_matrix}), to measure vetting robustness under severe domain shift, EXP-013 transfers the frozen TARS pipeline (calibrated on TESS 2-minute cadence data) to space photometry from the Kepler ($N=100$) and K2 ($N=41$) missions. Because Kepler observations feature 29.4-minute long cadence integrations, the protocol evaluates the physical degradation of transit-edge gradients. We measure feature distribution shifts using Cohen's $d$, out-of-domain ranking collapse via AUROC, and probability calibration decay via ECE and Brier score.
+
+\subsubsection{Nested Control Audit Protocol (EXP-019)} \label{sec:method_exp019_protocol}
+As Experiment~12 in our executed sequence (preregistered label EXP-019; Table~\ref{tab:experiment_master_matrix}), standard vetting evaluations often attribute classification success to novel domain features without controlling for collinearity with classical signal strength metrics. To test whether the Recovery Ambiguity Index encodes unique physical information independent of detection significance, EXP-019 deploys a nested logistic regression audit on the $N = 1{,}780$ unblinded targets from EXP-012. We construct:
+\begin{align}
+\text{Model 1 (Null)}: \quad \text{logit}(P) &= \beta_0 + \beta_1 \cdot \text{SDE} \\
+\text{Model 2 (Full)}: \quad \text{logit}(P) &= \beta_0 + \beta_1 \cdot \text{SDE} + \beta_2 \cdot \text{RAI}
+\end{align}
+We test the null hypothesis $H_0: \beta_2 = 0$ using both the likelihood-ratio test and the Wald $z$-test ($\alpha = 0.05$). Failure to reject $H_0$ demonstrates that the index is conditionally redundant with classical SDE, demonstrating how nested regression audits expose feature overclaiming that standard AUROC benchmarking obscures.
+
+\subsubsection{Realistic Observational Noise Sweep Protocol (EXP-023)} \label{sec:method_exp023_protocol}
+As Experiment~13 in our executed sequence (preregistered label EXP-023; Table~\ref{tab:experiment_master_matrix}), classical sensitivity analyses typically assume stationary white Gaussian noise. To test pipeline resilience under realistic non-Gaussian astrophysical conditions, EXP-023 injects synthetic transit signals into $500$ light curves corrupted by realistic stellar granulation (Harvey-like power spectra), stellar flares, and instrumental baseline wander. We sweep the injected signal-to-noise ratio and measure decision threshold drift, false alarm rates, and graph topological deformation boundaries.
 

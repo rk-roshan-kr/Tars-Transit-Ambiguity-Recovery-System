@@ -15,7 +15,7 @@ However, only a small fraction of TCEs correspond to true planetary systems. In 
 Due to the sheer volume of candidates (e.g., tens of thousands of TCEs generated per sector or quarter), manual visual inspection is impossible. Consequently, automated vetting systems are required to filter out false positives and rank candidates before allocating limited ground-based follow-up resources (such as high-precision radial velocity spectrographs or adaptive optics imaging).
 
 \subsection{Automated Vetting Evolution: History and Context} \label{sec:vetting_history}
-The historical evolution of automated exoplanet transit vetting has progressed through three distinct eras, moving from heuristic, rule-based expert systems to complex machine learning classifiers, and finally to computationally intensive Bayesian simulations.
+The historical evolution of automated exoplanet transit vetting has progressed through three distinct eras, moving from heuristic, rule-based expert systems to complex machine learning classifiers, and finally to computationally intensive Bayesian simulations (as shown in Figure~\ref{fig:evolution}).
 
 \begin{figure*}[htbp]
 \centering
@@ -107,6 +107,7 @@ Automated vetting is not a single decision, but rather the culmination of a mult
 \label{fig:pipeline_flow}
 \end{figure*}
 
+The layout of the vetting architecture is summarized in Figure~\ref{fig:pipeline_flow}.
 \begin{enumerate}
 \item \textbf{Stage 1 (Signal Conditioning)}: Raw flux series are processed to remove long-term stellar rotational modulation and instrumental systematics \citep{Smith2012, Stumpe2012, Vanderburg2014, Luger2016, Luger2018, Aigrain2016}. This is achieved via high-pass filtering, iterative spline fitting, or projecting onto Co-trending Basis Vectors (CBVs). The conditioning stage must balance systematic removal against the preservation of long-period transits.
 \item \textbf{Stage 2 (Transit Detection)}: The detrended light curve is searched for periodic transit signatures. Candidates are identified by finding the period $P$, epoch $T_0$, and duration $W$ that maximize the transit depth significance using algorithms such as BLS \citep{Kovacs2002} or TLS \citep{Hippke2019}.
@@ -141,7 +142,39 @@ To build robust classifiers, it is essential to distinguish between two types of
 
 Many existing vetting pipelines primarily optimize classification performance rather than explicitly separating epistemic recovery ambiguity from astrophysical false-positive probability. They construct classifiers containing up to dozens of correlated features (such as ``family complexity'', which counts raw alias frequencies and periodogram peaks) to predict the class label $P(\text{Planet} \mid X)$. Because these classifiers are fit on historical catalogs, they are highly sensitive to dataset selection biases and cannot trace \textit{why} a candidate is flagged as ambiguous.
 
-\subsection{Summary of TARS v1 Contribution} \label{sec:contribution}
-In this work, we present \textbf{TARS v1} (Transit Ambiguity Recovery System), a parsimonious framework that isolates and quantifies exoplanet recovery ambiguity. Rather than relying on a large machine learning model with dozens of features, we introduce the \textbf{Recovery Ambiguity Index (RAI)}, an unsupervised index constructed as a signed sum of five standardized graph-theoretic and harmonic features derived from information theory \citep{Shannon1948, Cover2006} and complex network topology \citep{Watts1998, Newman2010}. The RAI directly measures the epistemic uncertainty of signal recovery by analyzing period recovery stability, alias graph entropy, harmonic density, period uniqueness, and candidate concentration.
+\subsection{Operationalizing a Multi-Dimensional Validation Protocol} \label{sec:contribution}
 
-We show that this single-feature index achieves comparable ranking performance to complex multi-feature stacks on our independent Blind Validation Partition (consisting of $N=\BlindLCCount$ TESS light curves across $N_{\text{stars}}=\BlindStarCount$ independent stellar systems; see Table~\ref{tab:dataset_overview} and Figure~\ref{fig:dataset_workflow}). We demonstrate through information-theoretic conditional mutual information (CMI) sweeps that, within the evaluated validation protocol, legacy stellar activity features do not contribute detectable unique predictive information after controlling for the RAI. This suggests that transit vetting pipelines could be substantially simplified under equivalent noise regimes while maintaining calibration reliability.
+To address the limitations of conventional exoplanet vetting evaluations, this work operationalizes and evaluates a reproducible, multi-dimensional validation protocol for ambiguity-aware transit-vetting pipelines. Rather than evaluating a classifier solely on a single, local train/test split, our protocol establishes a multi-layered certification hierarchy (Figure~\ref{fig:validation_hierarchy}) designed to expose hidden operational limits, calibration decay under domain shifts, and statistical redundancies.
+
+\begin{figure*}[htbp]
+\centering
+\begin{tikzpicture}[node distance=1.5cm, auto, >=latex', thick,
+    block/.style={rectangle, draw, fill=blue!5, text width=6.5cm, text centered, rounded corners, minimum height=0.9cm},
+    line/.style={draw, ->, shorten >=1pt}]
+    
+    \node [block] (acc) {\textbf{Layer 1: Discrimination \& Accuracy} \\ \small (Single-split AUROC \& F1 benchmarking)};
+    \node [block, below of=acc, node distance=1.8cm] (cal) {\textbf{Layer 2: Probability Calibration} \\ \small (ECE and reliability curves by mission)};
+    \node [block, below of=cal, node distance=1.8cm] (rob) {\textbf{Layer 3: Measurement Robustness} \\ \small (Stability under noise, jitter, and data loss)};
+    \node [block, below of=rob, node distance=1.8cm] (dom) {\textbf{Layer 4: Domain Generalization} \\ \small (Cross-mission transfer: TESS $\rightarrow$ Kepler/K2)};
+    \node [block, below of=dom, node distance=1.8cm] (nest) {\textbf{Layer 5: Nested Control Audits} \\ \small (Nested regression for independent value; EXP-019)};
+    \node [block, below of=nest, node distance=1.8cm] (fail) {\textbf{Layer 6: Physical Failure Taxonomy} \\ \small (Isolating giant star noise \& cadence limits)};
+    
+    \path [line] (acc) -- (cal);
+    \path [line] (cal) -- (rob);
+    \path [line] (rob) -- (dom);
+    \path [line] (dom) -- (nest);
+    \path [line] (nest) -- (fail);
+    
+\end{tikzpicture}
+\caption{The Multi-Dimensional Validation Hierarchy. Exoplanet vetting systems must be certified across all six layers of this protocol to ensure scientific reliability, going beyond standard single-split AUROC testing. Each certification layer maps directly to our 13 coordinated validation experiments (Section~\ref{sec:method_experiment_matrix}, Table~\ref{tab:experiment_master_matrix}): Layer 1 (Discrimination \& Accuracy): EXP-001, EXP-004, EXP-005, EXP-011, EXP-012; Layer 2 (Probability Calibration): EXP-007, EXP-009, EXP-011; Layer 3 (Measurement Robustness): EXP-007, EXP-023; Layer 4 (Domain Generalization): EXP-013; Layer 5 (Nested Control Audits): EXP-019; Layer 6 (Physical Failure Taxonomy): EXP-002, EXP-003, and host-star cohort partitioning.}
+\label{fig:validation_hierarchy}
+\end{figure*}
+
+Under this protocol, we evaluate the Transit Ambiguity Recovery System (TARS) as a baseline case study. TARS employs a graph-theoretic Recovery Ambiguity Index (RAI) constructed as a parsimonious, signed sum of five standardized graph-theoretic and harmonic features derived from information theory \citep{Shannon1948, Cover2006}. To execute this multi-layer audit systematically, our study operationalizes a coordinated suite of 13 executed validation experiments selected from our 23-stage preregistered experimental registry (spanning designations EXP-001 through EXP-023, with intermediate numbers corresponding to internal engineering calibrations and exploratory runs archived during pipeline development; fully cataloged in Section~\ref{sec:method_experiment_matrix}, Table~\ref{tab:experiment_master_matrix}), spanning full-scale production runs, synthetic injection sweeps, nested feature audits, and cross-mission stress tests. We deploy this validation protocol to evaluate TARS on unblinded cohorts from TESS, Kepler, and K2 ($N=1780$, $100$, and $41$ respectively), showing that while TARS achieves comparable discrimination to complex stacks on standard splits, our multi-dimensional auditing successfully diagnoses its operational limits:
+\begin{itemize}
+    \item \textbf{Out-of-Domain Collapse}: Evaluating on Kepler long-cadence data reveals a collapse in ranking performance ($\text{AUROC} \approx 0.48$) and severe calibration decay (ECE $= 0.5212$), tracing a physical sensitivity limit induced by cadence-driven transit-edge blurring.
+    \item \textbf{Nested Controls}: Nested regression controls (EXP-019; Section~\ref{sec:results_exp019}) expose that the graph-theoretic RAI lacks statistically significant independent predictive value once controlling for BLS SDE, directly identifying a feature redundancy that conventional evaluations fail to detect.
+    \item \textbf{Cohort Boundaries}: Subgroup partitioning isolates stellar convective noise on giant hosts ($\log g < 4.0$) as a physical boundary deforming graph topology, defining where the classifier fails.
+\end{itemize}
+
+By proposing and testing this protocol, we demonstrate that rigorous evaluation can systematically reveal hidden limitations in exoplanet vetting pipelines, providing a reusable framework for certifying future automated search engines before large-scale production deployment.

@@ -129,3 +129,66 @@ These results suggest a complementary hybrid architecture:
 
 This division of labor exploits the complementary strengths of each approach: folding-based methods have higher sensitivity in the low-SNR regime; the event-space architecture is orders of magnitude faster and provides interpretable ambiguity scores in the high-SNR regime. Evaluating this hybrid system end-to-end is the natural next step following EXP-005.
 
+\begin{figure*}[htbp]
+\centering
+\begin{tikzpicture}[node distance=2.2cm, auto, >=latex', thick,
+    box/.style={rectangle, draw, text width=6.5cm, text centered, rounded corners, minimum height=4.5cm},
+    line/.style={draw, ->, shorten >=1pt}]
+    
+    \node [box, fill=red!5] (conv) {
+        \textbf{Conventional Vetting Evaluation} \\
+        \vspace{0.2cm}
+        \begin{itemize}
+            \item Single-split training/testing
+            \item Optimizes overall AUROC/F1
+            \item Treats host stars as homogeneous
+            \item Uncalibrated vetting thresholds
+            \item High-risk of out-of-domain collapse
+        \end{itemize}
+    };
+    
+    \node [box, fill=green!5, right of=conv, node distance=8.5cm] (frame) {
+        \textbf{Our Multi-Dimensional Protocol} \\
+        \vspace{0.2cm}
+        \begin{itemize}
+            \item Cross-mission out-of-domain transfer
+            \item Binned Expected Calibration Error (ECE)
+            \item Cohort partitioning (active/quiet stars)
+            \item Parameter-space noise stress sweeps
+            \item Nested-regression redundancy checks
+        \end{itemize}
+    };
+    
+    \draw[<->, dashed, line width=1.5pt] (conv) -- node[above] {Comparison} (frame);
+    
+\end{tikzpicture}
+\caption{Conceptual comparison between conventional single-split vetting evaluation and our multi-dimensional validation protocol. Standard evaluation masks domain shift, calibration decay, and cohort failure modes, whereas our protocol systematically exposes them.}
+\label{fig:conventional_vs_framework}
+\end{figure*}
+
+\subsection{Methodological Comparison: Beyond AUROC in Vetting Evaluation} \label{sec:disc_beyond_auroc}
+
+To demonstrate why standard single-metric evaluation protocols are insufficient for exoplanet Vetting systems, we present a comparison of standard evaluation practices against the multi-dimensional validation protocol implemented in this work (see Figure~\ref{fig:conventional_vs_framework} and Table~\ref{tab:evaluation_comparison}).
+
+\begin{deluxetable*}{ll}[htbp]
+\tablecaption{Methodological Comparison: Standard Vetting Evaluation vs. Multi-Dimensional Validation Protocol\label{tab:evaluation_comparison}}
+\tablewidth{0pt}
+\tablehead{
+  \colhead{Standard Evaluation Practice} & \colhead{Insights Revealed by Multi-Dimensional Protocol}
+}
+\startdata
+\textbf{Standard single-split AUROC} & \parbox{12.0cm}{Out-of-domain performance collapse. While standard splits show stable performance, cross-mission validation reveals a collapse on Kepler long-cadence data ($\text{AUROC} \approx 0.48$) due to cadence-induced transit-edge blurring.} \\
+\hline
+\textbf{Local test-set accuracy} & \parbox{12.0cm}{Hidden probability calibration decay. Single accuracy metrics mask the fact that predicted probabilities become severely miscalibrated under domain shifts (Kepler ECE $= 0.5212$ vs. TESS ECE $= 0.0966$).} \\
+\hline
+\textbf{Homogeneous target splits} & \parbox{12.0cm}{Physical stellar cohort limitations. Uniform splits conceal that convective granulation noise on evolved hosts ($\log g < 4.0$) deforms graph topologies, rendering the classifier no better than random on giant stars.} \\
+\hline
+\textbf{Single-metric benchmarking} & \parbox{12.0cm}{Robustness and operational boundaries. Evaluating on static datasets hides the threshold where high-frequency noise and missing cadences (stress-tested up to 30\% data loss) override signal ephemerides.} \\
+\hline
+\textbf{Independent feature listing} & \parbox{12.0cm}{Predictive redundancy under nested control. Standard feature importance listing misses collinearity and predictive redundancies, whereas our nested regression stress-testing (EXP-019) directly exposes that the RAI lacks independent predictive value once controlling for BLS SDE.} \\
+\enddata
+\end{deluxetable*}
+
+This comparison demonstrates that a high AUROC on a local training/validation split does not guarantee scientific validity or operational utility. Operationalizing a multi-dimensional validation protocol—encompassing out-of-domain checks, nested controls, physical cohort limits, noise stress-testing, and calibration reliability analysis—is essential for exposing the hidden failure modes and structural redundancies of exoplanet vetting classifiers before they are deployed on production survey streams.
+
+

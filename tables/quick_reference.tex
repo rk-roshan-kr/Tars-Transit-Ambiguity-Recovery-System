@@ -7,17 +7,29 @@
 Metric / Domain & Value & Notes \\
 \hline
 \textbf{Ranking Performance} & & \\
-Blind Validation AUROC & $0.6732 \pm 0.0404$ & Comparable to 16-feature ensembles \\
-95\% Confidence Interval & $[0.5912, 0.7474]$ & Wide interval reflects $N=175$ sample size \\\\\n$\Delta$ AUROC vs. Linear Stack & $+0.0378$ & Statistically indistinguishable (95\% CI spans zero) \\\\\n\hline
+Blind Validation AUROC & $0.6732 \pm 0.0404$ & \parbox{8.0cm}{Comparable to 16-feature ensembles} \\
+95\% Confidence Interval & $[0.5912, 0.7474]$ & \parbox{8.0cm}{Wide interval reflects $N=175$ sample size} \\
+$\Delta$ AUROC vs. Linear Stack & $+0.0378$ & \parbox{8.0cm}{Statistically indistinguishable (95\% CI spans zero)} \\
+\hline
 \textbf{Calibration \& Utility} & & \\
-Expected Calibration Error (ECE) & 0.0644 & 24\% lower than the Linear Stack (ECE = 0.0854) \\
-Brier Score & 0.2309 & Strong alignment of probability thresholds \\
-Optimal F1-Score Threshold & 0.5759 & Yields 90\% recall and 64\% precision on blind set \\\\\n\hline
+Expected Calibration Error (ECE) & 0.0644 & \parbox{8.0cm}{24\% lower than the Linear Stack (ECE = 0.0854)} \\
+Brier Score & 0.2309 & \parbox{8.0cm}{Strong alignment of probability thresholds} \\
+Optimal F1-Score Threshold & 0.5759 & \parbox{8.0cm}{Yields 90\% recall and 64\% precision on blind set} \\
+\hline
 \textbf{Computational Efficiency} & & \\
-Feature Dimensionality & 1 vs. 16 & 93.75\% reduction in classifier input size \\\\\nRuntime per Candidate & $<0.1$\,s & Scaled as $O(N_{\text{final}}^2)$ with $N_{\text{final}} < 200$ \\\\\nSpeedup vs. Vespa & $50\times - 300\times$ & Vespa MCMC requires 5--30 minutes per target \\\\\n\hline
+Feature Dimensionality & 1 vs. 16 & \parbox{8.0cm}{93.75\% reduction in classifier input size} \\
+Runtime per Candidate & $<0.1$\,s & \parbox{8.0cm}{Scaled as $O(N_{\text{final}}^2)$ with $N_{\text{final}} < 200$} \\
+Speedup vs. Vespa & $50\times - 300\times$ & \parbox{8.0cm}{Vespa MCMC requires 5--30 minutes per target} \\
+\hline
 \textbf{Statistical Power} & & \\
-Detected Effect Size & $d = 4.29$ & Extremely large ranking effect vs. random classifier \\\\\nAchieved Power ($\alpha=0.05$) & 99\% & High statistical validation confidence \\\\\nRequired Sample Size & 75 & Minimum $N$ required to achieve 80\% power \\\\\n\hline
+Detected Effect Size & $d = 4.29$ & \parbox{8.0cm}{Extremely large ranking effect vs. random classifier} \\
+Achieved Power ($\alpha=0.05$) & 99\% & \parbox{8.0cm}{High statistical validation confidence} \\
+Required Sample Size & 75 & \parbox{8.0cm}{Minimum $N$ required to achieve 80\% power} \\
+\hline
 \textbf{Applicability \& Limits} & & \\
-Stellar gravity applicability & $\log g \ge 4.0$ & Restricted to dwarf hosts ($\sim 96$\% of survey) \\\\\nGiant host stars & AUROC = 0.20 & Not applicable due to convective noise aliasing \\\\\nDynamical systems & Assumes linear ephemeris & Systems with strong TTVs are currently rejected \\\\\n\hline
+Stellar gravity applicability & $\log g \ge 4.0$ & \parbox{8.0cm}{Restricted to dwarf hosts ($\sim 96$\% of survey)} \\
+Giant host stars & AUROC = 0.20 & \parbox{8.0cm}{Not applicable due to convective noise aliasing} \\
+Dynamical systems & Assumes linear ephemeris & \parbox{8.0cm}{Systems with strong TTVs are currently rejected} \\
+\hline
 \end{tabular}
 \end{table*}

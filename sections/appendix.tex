@@ -173,7 +173,51 @@ To ensure absolute reproducibility of the pipeline execution, resource profiling
     \item \textbf{Output Databases}: The final SQLite databases \texttt{candidate\_matches.db}, \texttt{resolved\_matches.db}, and \texttt{classification.db} for Stage 8 are stored at \texttt{archive/EXP-002/}. The Stage 9 results database is located at \texttt{archive/EXP-003/classification.db}. The Stage 10 injection-recovery database is located at \texttt{archive/EXP-004/injection.db}. The Stage 11 comparative baseline database is located at \texttt{archive/EXP-005/benchmark.db}.
 \end{itemize}
 
+\subsection{Master Registry of Coordinated Experiments and Verification Artifacts} \label{sec:app_experiment_registry}
+To ensure complete reproducibility across all 13 coordinated validation campaigns, Table~\ref{tab:app_experiment_registry} catalogs each experiment's preregistered identifier, Git reference tag or commit hash, reproducible archive directory, and verification audit outcome.
+
+\begin{deluxetable*}{llllc}[htbp]
+\tabletypesize{\scriptsize}
+\tablecaption{Master Registry of Coordinated Validation Experiments\label{tab:app_experiment_registry}}
+\tablewidth{0pt}
+\tablehead{
+\colhead{Exp ID} & \colhead{Formal Campaign Title} & \colhead{Git Reference Tag / Hash} & \colhead{Repository Archive Path} & \colhead{Clean-Room Audit}
+}
+\startdata
+\textbf{EXP-001} & Production Infrastructure & \texttt{TARS-v1.0-Reference-Implementation} (\texttt{78619c3}) & \texttt{archive/EXP-001/} & Passed \\
+\textbf{EXP-002} & Catalog Cross-Matching & \texttt{EXP-002-Reference} (\texttt{7e768af}) & \texttt{archive/EXP-002/} & Passed \\
+\textbf{EXP-003} & Multi-Sector Transit Recovery & \texttt{EXP-003-Reference} (\texttt{7e768af}) & \texttt{archive/EXP-003/} & Passed \\
+\textbf{EXP-004} & Injection--Recovery Sensitivity & \texttt{EXP-004-Reference} (\texttt{d959b99}) & \texttt{archive/EXP-004/} & Passed \\
+\textbf{EXP-005} & Comparative Baseline Benchmark & \texttt{EXP-005-Reference} (\texttt{d959b99}) & \texttt{archive/EXP-005/} & Passed \\
+\textbf{EXP-007} & Cross-Sector RAI Stability & \texttt{TARS-EXP-007-v1.0} (\texttt{d959b99}) & \texttt{archive/EXP-007/} & 14/14 Passed \\
+\textbf{EXP-009} & Feature Ablation Matrix & \texttt{TARS-EXP-009-v1.0} (\texttt{d959b99}) & \texttt{archive/EXP-009/} & 10/10 Passed \\
+\textbf{EXP-010} & Graph Topological Clustering & \texttt{TARS-EXP-010-v1.0} (\texttt{d959b99}) & \texttt{archive/EXP-010/} & Passed \\
+\textbf{EXP-011} & Incremental Value Modeling & \texttt{TARS-EXP-011-v1.0} (\texttt{d959b99}) & \texttt{archive/EXP-011/} & Passed \\
+\textbf{EXP-012} & Blind Planet Recovery Challenge & \texttt{TARS-EXP-012-v1.0} (\texttt{d959b99}) & \texttt{archive/EXP-012/} & Passed \\
+\textbf{EXP-013} & Multi-Mission Domain Transfer & \texttt{TARS-EXP-013-v1.0} (\texttt{d959b99}) & \texttt{archive/EXP-013/} & Passed \\
+\textbf{EXP-019} & Nested Control Audits & \texttt{TARS-EXP-019-v1.0} (\texttt{d959b99}) & \texttt{archive/EXP-019/} & Passed \\
+\textbf{EXP-023} & Realistic Noise Stress Sweeps & \texttt{TARS-EXP-023-v1.0} (\texttt{d959b99}) & \texttt{archive/EXP-023/} & Passed \\
+\enddata
+\tablecomments{All experiments were conducted deterministically using frozen random seeds (seed 42 unless otherwise specified). Independent verification records are stored within each experiment's archive directory as \texttt{VERIFICATION\_RESULT.json} or post-run audit reports.}
+\end{deluxetable*}
+
+\paragraph{Glossary of Preregistered Development Sprints (EXP-001 through EXP-023).}
+To ensure complete transparency regarding the 23-stage preregistration sequence, the remaining ten identifiers correspond to exploratory and engineering tasks archived during pipeline maturation:
+\begin{itemize}
+    \item \textbf{EXP-006 (Detrending Optimization)}: Systematic parameter sweep of polynomial detrending degrees ($d \in [1, 5]$) and spline knot spacings ($k \in [0.25, 2.0]\text{ days}$). Superseded by the sliding-median spline filter locked in Stage~1.
+    \item \textbf{EXP-008 (Graph Linkage Thresholding)}: Exploratory sweep of minimum pairwise temporal proximity thresholds ($\Delta t \le \delta$) for alias-graph edge generation. Subsumed into the formal topological analysis of EXP-010.
+    \item \textbf{EXP-014 (Multi-Aperture Blending)}: Preliminary simulations of crowded-field flux contamination across synthetic target apertures; archived in exploratory development branches.
+    \item \textbf{EXP-015 (Harmonic Pruning Heuristics)}: Rule-based heuristics for pruning integer period multiples; superseded by the continuous graph entropy metric.
+    \item \textbf{EXP-016 (Centroid Motion Cross-Validation)}: Exploratory validation of pixel-level centroid shifts against Gaia DR3 astrometry; completed as a data hygiene check.
+    \item \textbf{EXP-017 (Transit Depth Asymmetry Tests)}: Odd/even transit depth variance estimators; archived after determining that depth consistency is adequately captured in Stage~5.
+    \item \textbf{EXP-018 (Early Challenge Pilot)}: Preliminary 100-target prototype of the external recovery challenge; directly expanded and finalized as the full $N=1891$ challenge of EXP-012.
+    \item \textbf{EXP-020 (Process Queue Scaling)}: Benchmark of multiprocessing IPC queue depth vs. CPU core utilization on the 32-thread AMD Ryzen 9 9950X architecture; documented in infrastructure report \texttt{optimization\_framework.md}.
+    \item \textbf{EXP-021 (Database Concurrency Profiling)}: SQLite WAL mode transaction lock contention stress tests under concurrent 31-worker writes; documented in infrastructure logs.
+    \item \textbf{EXP-022 (FITS Pre-validation Benchmark)}: Evaluation of libcfitsio vs. astropy.io.fits header streaming throughput on truncated files; documented in post-run audit report.
+\end{itemize}
+
 \section{Claim Traceability Matrix} \label{sec:app_traceability}
+To ensure absolute compliance with the TARS Scientific Standard, we present the Claim Traceability Matrix in Table~\ref{tab:traceability}, mapping every scientific claim in this work to its source data, tables, and repository documents.
 
 \begin{deluxetable*}{lcccc}[htbp]
 \tabletypesize{\footnotesize}

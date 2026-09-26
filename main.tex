@@ -7,13 +7,25 @@
 \usetikzlibrary{arrows,shapes,positioning,fit}
 \usepackage[ruled,vlined]{algorithm2e}
 
-\shorttitle{TARS: Transit Ambiguity Recovery System}
+\shorttitle{Evaluating Exoplanet Vetting Systems}
 \shortauthors{Gupta}
 \input{generated_defs}
 
+% Improve float placement and prevent single-table page clearance
+\renewcommand{\topfraction}{.85}
+\renewcommand{\bottomfraction}{.7}
+\renewcommand{\textfraction}{.15}
+\renewcommand{\floatpagefraction}{.66}
+\renewcommand{\dbltopfraction}{.66}
+\renewcommand{\dblfloatpagefraction}{.66}
+\setcounter{topnumber}{9}
+\setcounter{bottomnumber}{9}
+\setcounter{totalnumber}{20}
+\setcounter{dbltopnumber}{9}
+
 \begin{document}
 
-\title{Transit Ambiguity Recovery System (TARS): Isolating and Quantifying Signal Recovery Ambiguity in Exoplanet Vetting}
+\title{Beyond AUROC: A Reproducible Framework for Evaluating Exoplanet Vetting Systems}
 
 \author{Roshan Kumar Gupta}
 \affiliation{Department of Computer Science \& Engineering, Chandigarh University, Mohali, Punjab, India}
